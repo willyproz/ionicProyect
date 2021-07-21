@@ -12,4 +12,9 @@ export class InicioPage implements OnInit {
   ngOnInit() {
   }
 
+  menuTemp   = [
+    {'nombre':  'ADMINISTRAR', 'icono' : 'print', 'clase' : 'Comex', 'ruta' : '#', 'estado' : ''},
+    {'nombre':  'CONSULTAR', 'icono' : 'ticket', 'clase' : 'Compras', 'ruta' : '/consulta', 'estado' : 'disabled'},
+    {'nombre':  'FORMULARIOS', 'icono' : 'eye', 'clase' : 'Planta', 'ruta' : '/formulario', 'estado': 'disabled'},
+ ];
 }

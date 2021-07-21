@@ -1,0 +1,57 @@
+<app-header titulo="CONSULTAS"></app-header>
+
+<ion-content>
+
+  <!-----------TABLA Rk_Hc_Hacienda-------------->
+
+  <div class="panel panel-default">
+    <div class="panel-heading text-center"><b>TABLA RK_HC_HACIENDAS</b></div>
+    <div class="panel-body"  style="overflow-y: scroll; height: 100px;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>SIGLA</th>
+          <th>NOMBRE</th>
+          <th>ESTADO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of DataHacienda">
+          <td>{{data.id}}</td>
+          <td>{{data.sigla}}</td>
+          <td>{{data.nombre}}</td>
+          <td>{{data.estado}}</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+<!-----------TABLA Rk_Hc_Usuario-------------->
+
+<div class="panel panel-default">
+  <div class="panel-heading text-center"><b>TABLA RK_HC_USUARIO</b></div>
+  <div class="panel-body"  style="overflow-y: scroll; height: 100px;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>CEDULA</th>
+        <th>NOMBRE</th>
+        <th>CORREO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of DataUsuario">
+        <td>{{data.id}}</td>
+        <td>{{data.cedula}}</td>
+        <td>{{data.nombre}}</td>
+        <td>{{data.correo}}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+</ion-content>

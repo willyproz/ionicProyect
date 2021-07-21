@@ -6,6 +6,7 @@ import { FormInicioComponent } from './estructura-formularios/form-inicio/form-i
 import { FormTablaCComponent } from './estructura-formularios/form-tabla-c/form-tabla-c.component';
 import { FormTablaRComponent } from './estructura-formularios/form-tabla-r/form-tabla-r.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { EstilosMenuDashbboardComponent } from './estilos-menu-dashbboard/estilos-menu-dashbboard.component';
 
 
 
@@ -15,13 +16,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     HeaderComponent,
     FormInicioComponent,
     FormTablaCComponent,
-    FormTablaRComponent
+    FormTablaRComponent,
+    EstilosMenuDashbboardComponent
   ],
   exports:[
     HeaderComponent,
     FormInicioComponent,
     FormTablaCComponent,
-    FormTablaRComponent
+    FormTablaRComponent,
+    EstilosMenuDashbboardComponent
   ],
   imports: [
     CommonModule,

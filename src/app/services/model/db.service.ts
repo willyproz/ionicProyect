@@ -16,6 +16,7 @@ import { rk_hc_form_cab } from '../../model/rk_hc_form_cab';
 export class DbService {
   public storage: SQLiteObject;
   formularioList = new BehaviorSubject([]);
+  formularioListUsuario = new BehaviorSubject([]);
   private isDbReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   public respuesta: any;
@@ -37,6 +38,11 @@ export class DbService {
   dbState(){return this.isDbReady.asObservable();}
 
   fetchFormulario(): Observable<rk_hc_form_cab[]> {return this.formularioList.asObservable();}
+
+  fetchRkHcHacienda(): Observable<any[]> {return this.formularioList.asObservable();}
+
+  fetchRkHcUsuario(): Observable<any[]> {return this.formularioListUsuario.asObservable();}
+
 
     // Render fake data
     getFakeData() {
@@ -82,6 +88,40 @@ export class DbService {
     });
   }
 
+
+  getAllRkHcHacienda(){
+    return this.storage.executeSql('SELECT * FROM rk_hc_hacienda', []).then(res => {
+      let items: any[] = [];
+      if (res.rows.length > 0) {
+        for (var i = 0; i < res.rows.length; i++) {
+          items.push({
+            id: res.rows.item(i).id,
+            sigla: res.rows.item(i).sigla,
+            nombre: res.rows.item(i).nombre,
+            estado: res.rows.item(i).estado
+          });
+        }
+      }
+      this.formularioList.next(items);
+    });
+  }
+
+  getAllRkHcUsuario(){
+    return this.storage.executeSql('SELECT * FROM rk_hc_usuario', []).then(res => {
+      let items: any[] = [];
+      if (res.rows.length > 0) {
+        for (var i = 0; i < res.rows.length; i++) {
+          items.push({
+            id: res.rows.item(i).id,
+            cedula: res.rows.item(i).cedula,
+            nombre: res.rows.item(i).nombre,
+            correo: res.rows.item(i).correo
+          });
+        }
+      }
+      this.formularioListUsuario.next(items);
+    });
+  }
   // Add
   insertarNuevoFormulario(hacienda_id,lote,modulo,tipo_muestra_id) {
     let data = [hacienda_id,lote,modulo,tipo_muestra_id];
@@ -104,57 +144,44 @@ export class DbService {
     });
   }
 
-
   async syncData(){
     await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda',{}).toPromise()
     .then( res => {
       console.log(res['rk_hc_hacienda']);
-      console.log('la longitud es: '+res['rk_hc_hacienda'].length);
-      let cntRkHcHacienda = res['rk_hc_hacienda'].length;
+     // let cntRkHcHacienda = res['rk_hc_hacienda'].length;
       let rkHcFormCab = 'INSERT INTO rk_hc_hacienda (id,sigla,nombre,estado) VALUES (?,?,?,?)';
-      let i:number = 0;
-      for (i = 0; i < cntRkHcHacienda; i++) {
-        let data = [res['rk_hc_hacienda'][i].id,res['rk_hc_hacienda'][i].sigla,res['rk_hc_hacienda'][i].nombre,res['rk_hc_hacienda'][i].estado];
-        this.storage.executeSql(rkHcFormCab, data)
-          .then(res => {  
-            if(res.rowsAffected > 0){
-              this.respuesta = {
-                estado:'ok',
-                mensaje: 'Columnas afectadas: '+ res.rowsAffected + ' , Id insertado: '+res.insertId
-              }
-            }else{
-              this.respuesta = {
-                estado:'error',
-                mensaje: res.message
-              }
-            }
-            console.log(this.respuesta);
-          }).catch(err => {
-           return this.respuesta = {
-              estado:'error',
-              mensaje: err.message
-            }
-          //  console.log(this.respuesta);
+    //  let i:number = 0;
+      res['rk_hc_hacienda'].forEach(function (value) {
+        let data = Object.values(value);
+          this.storage.executeSql(rkHcFormCab, data).catch(err =>{
+            return err;
           });
-      }
-    });
-    /*.subscribe((res:any[]) =>{
-      console.log(res);
-     /* this.syncDataRes = res['rk_hc_hacienda'][0];
-      return this.syncDataRes;*/
-     /*});*/
-    
-  
-    
-   /*
-    let rkHcFormCab = 'INSERT INTO rk_hc_form_cab (hacienda_id,lote,modulo,tipo_muestra_id) VALUES (?,?,?,?)';
-    let i:number;
-
-    for (i = 0; i < 6; i++) {
-      this.storage.executeSql(rkHcFormCab, data)
-        .then(res => {  
-          
-        });
+        //  console.log(Object.values(value));
+      });
+      /*for (i = 0; i < cntRkHcHacienda; i++) {
+        let data = [res['rk_hc_hacienda'][i].id,res['rk_hc_hacienda'][i].sigla,res['rk_hc_hacienda'][i].nombre,res['rk_hc_hacienda'][i].estado];
+         this.storage.executeSql(rkHcFormCab, data).catch(err =>{
+          return err;
+         });
       }*/
+
+     /* i = 0;
+      console.log(res);
+      //console.log(res);
+      let cntRkHcUsuario = res['rk_hc_usuario'].length;
+      let rkHcUsuario = 'INSERT INTO rk_hc_usuario (id,cedula,clave,correo,estado,exportador_id,fecha_cre,fecha_mod,nombre,ultimo_ingreso,usuario_cre_id,usuario_mod_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)';
+
+      for (i = 0; i < cntRkHcUsuario; i++) {
+        let data = [res['rk_hc_usuario'][i].id,res['rk_hc_usuario'][i].cedula,res['rk_hc_usuario'][i].clave,res['rk_hc_usuario'][i].correo,
+                   res['rk_hc_usuario'][i].estado,res['rk_hc_usuario'][i].exportador_id,res['rk_hc_usuario'][i].fecha_cre,
+                   res['rk_hc_usuario'][i].fecha_mod,res['rk_hc_usuario'][i].nombre,res['rk_hc_usuario'][i].ultimo_ingreso,
+                   res['rk_hc_usuario'][i].usuario_cre_id,res['rk_hc_usuario'][i].usuario_mod_id];
+         this.storage.executeSql(rkHcUsuario, data).catch(err =>{
+          return err;
+         });
+      }*/
+    });
+
+
   }
 }

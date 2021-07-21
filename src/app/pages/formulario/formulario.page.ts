@@ -44,7 +44,7 @@ export class FormularioPage {
 
  menuTempUtilitarios   = [
   {'nombre':  'DESCARGAR DATOS', 'icono' : 'refresh', 'clase' : 'Comex', 'ruta' : `syncronize()`, 'estado' : ''},
-  {'nombre':  'SUBIR DATOS', 'icono' : 'upload', 'clase' : 'Planta', 'ruta' : '/rk_planta/recepcionGarita', 'estado' : 'disabled'},
+  {'nombre':  'SUBIR DATOS', 'icono' : 'upload', 'clase' : 'Planta', 'ruta' : '#', 'estado' : 'disabled'},
 ];
   constructor(private db:DbService) { }
 
