@@ -1,0 +1,84 @@
+<app-header titulo="Mancha Angular"></app-header>
+
+<!--<ion-header>
+  <ion-toolbar>
+    <ion-title>Ionic 5 SQLite CRUD Example</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list lines="full">
+    <form [formGroup]="mainForm" (ngSubmit)="storeData()">
+      <ion-item>
+        <ion-label position="floating">Artist name</ion-label>
+        <ion-input formControlName="artist" type="text" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Song name</ion-label>
+        <ion-input formControlName="song" type="text" required>
+        </ion-input>
+      </ion-item>
+
+      <ion-row>
+        <ion-col>
+          <ion-button type="submit" color="primary" shape="full" expand="block">
+            Add Song
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </form>
+  </ion-list>
+
+    <ion-list>
+    <ion-list-header>
+      Songs
+    </ion-list-header>
+
+    <ion-item lines="inset" *ngFor="let data of Data">
+      <ion-label>
+        <h5>{{data.artist_name}}</h5>
+        <p>{{data.song_name}}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>-->
+
+<ion-content>
+  <div class="text-center">
+    <ion-button color="warning" size="large" (click)="btnAnterior()"><ion-icon name="arrow-back-outline"></ion-icon> ANT.</ion-button>
+    <ion-button color="warning" size="large" (click)="btnSiguiente()">SIG. <ion-icon name="arrow-forward-outline"></ion-icon></ion-button>
+  </div>
+  <ion-grid>
+        <app-form-inicio class="fma" id="ma0"></app-form-inicio>
+        <app-form-tabla-c class="hidden fma" id="ma1"></app-form-tabla-c>
+        <app-form-tabla-r class="hidden fma" id="ma2"></app-form-tabla-r>
+        <input type="hidden" id="cntForm" value="2" />
+  </ion-grid>
+  <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading text-center"><b>FORMULARIOS MANCHA ANGULAR</b></div>
+    <div class="panel-body"></div>
+    <!-- Table -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>HACIENDA</th>
+          <th>MUESTRA</th>
+          <th>LOTE</th>
+          <th>MODULO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of Data">
+          <td>{{data.id}}</td>
+          <td>{{data.hacienda_id}}</td>
+          <td>{{data.muestra_id}}</td>
+          <td>L{{data.lote}}</td>
+          <td>M{{data.modulo}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ion-content>

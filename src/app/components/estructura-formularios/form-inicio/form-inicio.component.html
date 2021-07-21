@@ -1,0 +1,65 @@
+<form [formGroup]="mainForm" (ngSubmit)="insertarFormulario()">
+<ion-row>
+  <ion-col class="ion-align-self-start">
+    <ion-item>
+      <ion-label>Responsable</ion-label>
+      <ion-select formControlName="responsable" placeholder="Seleccionar responsable">
+        <ion-select-option value="William Arevalo">William Arevalo</ion-select-option>
+        <ion-select-option value="Ramon Macias">Ramon Macias</ion-select-option>
+        <ion-select-option value="Dalton Gutierrez">Dalton Gutierrez</ion-select-option>
+        <ion-select-option value="Willman Chavez">Willman Chavez</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-col>
+  <ion-col class="ion-align-self-end">
+    <ion-item>
+      <ion-label>Hacienda</ion-label>
+      <ion-select formControlName="hacienda_id" placeholder="Seleccionar hacienda">
+        <ion-select-option value="Cabeza de Vaca">Cabeza de Vaca</ion-select-option>
+        <ion-select-option value="Guitran">Guitran</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-col>
+</ion-row>
+<ion-row>
+  <ion-col class="ion-align-self-start">
+    <ion-item>
+      <ion-label>Lote</ion-label>
+      <ion-select formControlName="lote" placeholder="Seleccionar lote">
+        <ion-select-option value="1">L1</ion-select-option>
+        <ion-select-option value="2">L2</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-col>
+  <ion-col class="ion-align-self-center">
+    <ion-item>
+      <ion-label>Modulo</ion-label>
+      <ion-select formControlName="modulo" placeholder="Seleccionar modulo">
+        <ion-select-option value="1">M1</ion-select-option>
+        <ion-select-option value="2">M2</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-col>
+  <ion-col class="ion-align-self-end">
+    <ion-item>
+      <ion-label>Tipo de muestra</ion-label>
+      <ion-select formControlName="tipo_muestra_id" placeholder="Seleccionar muestra">
+        <ion-select-option value="Cosecha">Cosecha</ion-select-option>
+        <ion-select-option value="Desarrollo de fruto">Desarrollo de Fruto</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-col>
+</ion-row>
+<ion-row>
+  <ion-col>
+    <ion-button type="submit" size="large" color="tertiary" expand="block">
+      <ion-icon name="checkmark-outline"></ion-icon>
+        Grabar
+    </ion-button>
+    <ion-button type="button" disabled="true" size="large" color="dark" expand="block">
+      <ion-icon name="warning-outline"></ion-icon>
+        Liquidar
+      </ion-button>
+    </ion-col>
+</ion-row>
+</form>
