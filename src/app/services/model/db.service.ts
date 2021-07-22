@@ -148,16 +148,27 @@ export class DbService {
     await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda',{}).toPromise()
     .then( res => {
       console.log(res['rk_hc_hacienda']);
-     // let cntRkHcHacienda = res['rk_hc_hacienda'].length;
+      let cntRkHcHacienda = res['rk_hc_hacienda'].length;
       let rkHcFormCab = 'INSERT INTO rk_hc_hacienda (id,sigla,nombre,estado) VALUES (?,?,?,?)';
-    //  let i:number = 0;
-      res['rk_hc_hacienda'].forEach(function (value) {
+      let i:number = 0;
+    for (i = 0; i < cntRkHcHacienda; i++) {
+      let data = [res['rk_hc_hacienda'][i].id,res['rk_hc_hacienda'][i].sigla,res['rk_hc_hacienda'][i].nombre,res['rk_hc_hacienda'][i].estado];
+       this.storage.executeSql(rkHcFormCab, data).catch(err =>{
+        return err;
+       });
+    }
+     /* res['rk_hc_hacienda'].forEach(function (value) {
+
+        let datas = [res['rk_hc_hacienda'][0].id,res['rk_hc_hacienda'][0].sigla,res['rk_hc_hacienda'][0].nombre,res['rk_hc_hacienda'][0].estado];
         let data = Object.values(value);
-          this.storage.executeSql(rkHcFormCab, data).catch(err =>{
+        console.log(Object.values(data));
+        console.log(Object.values(datas));
+
+          this.storage.executeSql(rkHcFormCab, datas).catch(err =>{
             return err;
           });
         //  console.log(Object.values(value));
-      });
+      });*/
       /*for (i = 0; i < cntRkHcHacienda; i++) {
         let data = [res['rk_hc_hacienda'][i].id,res['rk_hc_hacienda'][i].sigla,res['rk_hc_hacienda'][i].nombre,res['rk_hc_hacienda'][i].estado];
          this.storage.executeSql(rkHcFormCab, data).catch(err =>{
