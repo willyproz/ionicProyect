@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { DbService } from 'src/app/services/model/db.service';
+import { Sync } from 'src/app/services/model/sync.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 interface Componente{
   icon:string;
@@ -46,10 +47,11 @@ export class FormularioPage {
   {'nombre':  'DESCARGAR DATOS', 'icono' : 'refresh', 'clase' : 'Comex', 'ruta' : `syncronize()`, 'estado' : ''},
   {'nombre':  'SUBIR DATOS', 'icono' : 'upload', 'clase' : 'Planta', 'ruta' : '#', 'estado' : 'disabled'},
 ];
-  constructor(private db:DbService) { }
-
+  constructor(private db: Sync) { }
+  data = new BehaviorSubject([]);
   syncronize(){
-  this.db.syncData();
- // console.log(this.db.syncData());
+    this.db.openOrCreateDB().then( res => {
+      this.db.syncData(res);
+    });
   }
 }

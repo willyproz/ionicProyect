@@ -54,6 +54,7 @@ export class DbService {
           .then(_ => {
             //this.formularioService.getAllFormularios();
            // this.getFormularios();
+           console.log('TablasCreadas');
             this.isDbReady.next(true);
           })
           .catch(error => console.error(error));
@@ -144,19 +145,30 @@ export class DbService {
     });
   }
 
-  async syncData(){
+ /* async syncData(){
     await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda',{}).toPromise()
     .then( res => {
       console.log(res['rk_hc_hacienda']);
       let cntRkHcHacienda = res['rk_hc_hacienda'].length;
       let rkHcFormCab = 'INSERT INTO rk_hc_hacienda (id,sigla,nombre,estado) VALUES (?,?,?,?)';
-      let i:number = 0;
-    for (i = 0; i < cntRkHcHacienda; i++) {
-      let data = [res['rk_hc_hacienda'][i].id,res['rk_hc_hacienda'][i].sigla,res['rk_hc_hacienda'][i].nombre,res['rk_hc_hacienda'][i].estado];
-       this.storage.executeSql(rkHcFormCab, data).catch(err =>{
-        return err;
-       });
-    }
+      //let i:number = 0;
+      let rkHc = Object.values(res['rk_hc_hacienda']);
+      console.log(rkHc);
+      rkHc.forEach(function (value) {
+      //  let datas = [res['rk_hc_hacienda'][0].id,res['rk_hc_hacienda'][0].sigla,res['rk_hc_hacienda'][0].nombre,res['rk_hc_hacienda'][0].estado];
+        let data = Object.values(value);
+        console.log(Object.values(data));
+      //  console.log(Object.values(datas));
+          this.storage.executeSql(rkHcFormCab, data);
+      });
+
+
+    /*  for (i = 0; i < cntRkHcHacienda; i++) {
+        let data = [res['rk_hc_hacienda'][i].id,res['rk_hc_hacienda'][i].sigla,res['rk_hc_hacienda'][i].nombre,res['rk_hc_hacienda'][i].estado];
+        this.storage.executeSql(rkHcFormCab, data).catch(err =>{
+          return err;
+        });
+      }
      /* res['rk_hc_hacienda'].forEach(function (value) {
 
         let datas = [res['rk_hc_hacienda'][0].id,res['rk_hc_hacienda'][0].sigla,res['rk_hc_hacienda'][0].nombre,res['rk_hc_hacienda'][0].estado];
@@ -191,8 +203,8 @@ export class DbService {
           return err;
          });
       }*/
-    });
+  /*  });
 
 
-  }
+  }*/
 }

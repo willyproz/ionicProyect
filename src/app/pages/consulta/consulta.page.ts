@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DbService } from '../../services/model/db.service';
+import { DbQuery } from '../../services/model/dbQuerys.service';
 
 @Component({
   selector: 'app-consulta',
@@ -8,26 +8,26 @@ import { DbService } from '../../services/model/db.service';
 })
 export class ConsultaPage implements OnInit {
 
-  constructor(private db: DbService) {}
+  constructor(private dbQuery: DbQuery) {}
 
   DataHacienda: any[] = [];
   DataUsuario: any[] = [];
-
+  //consultaAll
   ngOnInit() {
-    this.db.dbState().subscribe((res) => {
-    this.db.getAllRkHcHacienda();
-    this.db.getAllRkHcUsuario();
-      if(res){
-        this.db.fetchRkHcHacienda().subscribe(item => {
-          this.DataHacienda = item
-          console.log(item);
-        });
-        this.db.fetchRkHcUsuario().subscribe(item => {
-          this.DataUsuario = item
-          console.log(item);
-        });
-      }
-    });
+    this.dbQuery.openOrCreateDB().then(db =>{
+      this.dbQuery.consultaAll(db,'SELECT * FROM rk_hc_hacienda order by nombre asc')
+      .then( item =>{
+      this.DataHacienda = item;
+      });
+
+    
+      this.dbQuery.consultaAll(db,'SELECT * FROM rk_hc_usuario order by nombre asc')
+      .then( item =>{
+        console.log(item);
+      this.DataUsuario = item;
+      });
+    })
+    
   }
 
 }
