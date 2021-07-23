@@ -17,7 +17,7 @@ export class DbQuery {
 
   constructor(private platform: Platform,private sqlite: SQLite,private httpClient: HttpClient, private sqlPorter: SQLitePorter)
   {
-    
+
   }
 
   openOrCreateDB(){
@@ -31,8 +31,8 @@ export class DbQuery {
         //.catch(e => console.log(e));
   }
 
-  consultaAll(db,sql){
-    return db.executeSql(sql, []).then(res => {
+  consultaAll(db,sql,search?){
+    return db.executeSql(sql, [search]).then(res => {
       let items: any[] = [];
       if (res.rows.length > 0) {
         for (var i = 0; i < res.rows.length; i++) {
@@ -42,5 +42,5 @@ export class DbQuery {
       return items;
     });
   }
-  
+
 }

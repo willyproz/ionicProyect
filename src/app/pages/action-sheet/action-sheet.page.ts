@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { DbService } from '../../services/model/db.service';
-import { ToastController } from '@ionic/angular';
-import { Router } from "@angular/router";
+import { DbQuery } from '../../services/model/dbQuerys.service';
+import { Router, ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -13,20 +12,43 @@ export class ActionSheetPage implements OnInit {
 
 
   constructor(
-    private db: DbService,
-    private toast: ToastController,
-    private router: Router
+    private dbQuery: DbQuery,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) { }
   Data: any[] = [];
+  titulo:string = '';
   ngOnInit() {
-    this.db.dbState().subscribe((res) => {
+  /*  this.db.dbState().subscribe((res) => {
       if(res){
         this.db.fetchFormulario().subscribe(item => {
           this.Data = item
         })
       }
+    });*/
+    let sigla = this.activatedRoute.snapshot.paramMap.get('id');
+    //console.log(sigla);
+
+    this.dbQuery.openOrCreateDB().then(db => {
+      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_tipo_formulario_cab fc LEFT JOIN rk_hc_tipo_formulario_det fd on fc.id = fd.tipo_formulario_cab_id WHERE sigla = ?',sigla)
+        .then(item => {
+          this.titulo = item[0].nombre_formulario;
+          this.Data = item;
+        });
     });
+
   }
+
+
+
+
+
+
+
+
+
+
+
 
 
   cnt:number = 0;

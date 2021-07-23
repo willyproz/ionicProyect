@@ -54,4 +54,140 @@
   </div>
 </div>
 
+<!-----------TABLA Rk_Hc_Lote-------------->
+
+<div class="panel panel-default">
+  <div class="panel-heading text-center"><b>TABLA RK_HC_LOTE</b></div>
+  <div class="panel-body"  style="overflow-y: scroll; height: 100px;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>HACIENDA_ID</th>
+        <th>LOTE</th>
+        <th>ESTADO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of DataLote">
+        <td>{{data.id}}</td>
+        <td>{{data.hacienda_id}}</td>
+        <td>{{data.lote}}</td>
+        <td>{{data.estado}}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+
+
+<!-----------TABLA Rk_Hc_Lote_det-------------->
+
+<div class="panel panel-default">
+  <div class="panel-heading text-center"><b>TABLA RK_HC_LOTE_DET</b></div>
+  <div class="panel-body"  style="overflow-y: scroll; height: 100px;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>LOTE_ID</th>
+        <th>MODULO</th>
+        <th>ESTADO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of DataLoteDet">
+        <td>{{data.id}}</td>
+        <td>{{data.lote_id}}</td>
+        <td>{{data.modulo}}</td>
+        <td>{{data.estado}}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-----------TABLA Rk_Hc_Formulario_cab-------------->
+
+<div class="panel panel-default">
+  <div class="panel-heading text-center"><b>TABLA RK_HC_TIPO_FORMULARIO_CAB</b></div>
+  <div class="panel-body"  style="overflow-y: scroll; height: 100px;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>NOMBRE FORM.</th>
+        <th>SIGLA</th>
+        <th>ESTADO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of DataTipoFormCab">
+        <td>{{data.id}}</td>
+        <td>{{data.nombre_formulario}}</td>
+        <td>{{data.sigla}}</td>
+        <td>{{data.estado}}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+
+<!-----------TABLA Rk_Hc_Formulario_det-------------->
+
+<div class="panel panel-default">
+  <div class="panel-heading text-center"><b>TABLA RK_HC_TIPO_FORMULARIO_DET</b></div>
+  <div class="panel-body"  style="overflow-y: scroll; height: 100px;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>NOMBRE</th>
+        <th>TIPO</th>
+        <th>ESTADO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of DataTipoFormDet">
+        <td>{{data.id}}</td>
+        <td>{{data.nombre}}</td>
+        <td>{{data.tipo}}</td>
+        <td>{{data.estado}}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+
+
+<!-----------TABLA Rk_Hc_tipo_muestra-------------->
+
+<div class="panel panel-default">
+  <div class="panel-heading text-center"><b>TABLA RK_HC_TIPO_MUESTRA</b></div>
+  <div class="panel-body"  style="overflow-y: scroll; height: 100px;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>NOMBRE</th>
+        <th>USUARIO_CRE</th>
+        <th>ESTADO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of DataTipoMuestra">
+        <td>{{data.id}}</td>
+        <td>{{data.nombre}}</td>
+        <td>{{data.usuario_cre}}</td>
+        <td>{{data.estado}}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+
 </ion-content>

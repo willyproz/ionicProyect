@@ -16,7 +16,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/alert/alert.module').then( m => m.AlertPageModule)
   },
   {
-    path: 'action-sheet',
+    path: 'action-sheet/:id',
     loadChildren: () => import('./pages/action-sheet/action-sheet.module').then( m => m.ActionSheetPageModule)
   },
   {

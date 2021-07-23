@@ -1,4 +1,4 @@
-<app-header titulo="Mancha Angular"></app-header>
+<app-header titulo="{{ titulo | uppercase}}"></app-header>
 
 <!--<ion-header>
   <ion-toolbar>
@@ -57,7 +57,7 @@
   </ion-grid>
   <div class="panel panel-default">
     <!-- Default panel contents -->
-    <div class="panel-heading text-center"><b>FORMULARIOS MANCHA ANGULAR</b></div>
+    <div class="panel-heading text-center"><b>FORMULARIOS {{ titulo | uppercase}}</b></div>
     <div class="panel-body"></div>
     <!-- Table -->
     <table class="table">
