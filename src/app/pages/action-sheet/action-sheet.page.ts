@@ -34,7 +34,7 @@ export class ActionSheetPage implements OnInit {
       this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_tipo_formulario_cab fc LEFT JOIN rk_hc_tipo_formulario_det fd on fc.id = fd.tipo_formulario_cab_id WHERE sigla = ?', sigla)
         .then(item => {
           this.titulo = item[0].nombre_formulario;
-          console.log(item);
+       //   console.log(item);
           this.FormStruct = item;
         });
     });

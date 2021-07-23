@@ -14,7 +14,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 
 export class Sync {
   public storage: SQLiteObject;
-  public respuesta: any = {};
+  public respuestaSync: any = '';
   constructor(private platform: Platform, private sqlite: SQLite, private httpClient: HttpClient, private sqlPorter: SQLitePorter) {
 
   }
@@ -178,6 +178,7 @@ export class Sync {
     await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda', {})
       .toPromise().then(
         async (res) => {
+
           let resultadoProcesoSyncHacienda = await this.procesoSyncHacienda(db, res);
 
           let resultadoProcesoSyncUsuario = await this.procesoSyncUsuario(db, res);
@@ -191,14 +192,6 @@ export class Sync {
           let resultadoProcesoSyncFomularioDet = await this.procesoSyncFomularioDet(db, res);
 
           let resultadoProcesoSyncTipoMuestra = await this.procesoSyncTipoMuestra(db, res);
-
-          console.log(resultadoProcesoSyncHacienda);
-          console.log(resultadoProcesoSyncUsuario);
-          console.log(resultadoProcesoSyncLote);
-          console.log(resultadoProcesoSyncLoteDet);
-          console.log(resultadoProcesoSyncFomularioCab);
-          console.log(resultadoProcesoSyncFomularioDet);
-          console.log(resultadoProcesoSyncTipoMuestra);
 
         }
       );

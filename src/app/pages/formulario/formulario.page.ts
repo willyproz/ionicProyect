@@ -59,7 +59,10 @@ export class FormularioPage {
     let loading = await this.msgService.loadingCreate('Sincronizando datos por favor espere...');
     this.msgService.loading(true, loading)
     this.db.openOrCreateDB().then(res => {
-      this.db.syncData(res).then(() => { this.msgService.loading(false, loading) });
+      this.db.syncData(res).then((r) => {
+        //console.log(r);
+        this.msgService.loading(false, loading)
+      });
     });
   }
 }

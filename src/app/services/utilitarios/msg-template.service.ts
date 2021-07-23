@@ -11,8 +11,8 @@ export class MsgTemplateService {
   constructor(public loadingCtrl: LoadingController) { }
 
 
-  msgOk(){
-    Swal.fire("OK",'Datos grabados con exito','success');
+  msgOk(msg:string ='Datos grabados con exito'){
+    Swal.fire("OK",msg,'success');
 
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");

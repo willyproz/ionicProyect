@@ -23,7 +23,7 @@ export class FormTablaRComponent implements OnInit {
     this.maxCuadrantes = Object.assign([], []);
     this.maxNotas = Object.assign([], []);
 
-    console.log(_data.id);
+   // console.log(_data.id);
 
     this.titulo = _data.nombre;
 

@@ -74,7 +74,7 @@ export class FormInicioComponent implements OnInit {
 
 
   insertarFormulario() {
-    console.log(this.mainForm.value);
+    //console.log(this.mainForm.value);
     /* this.db.insertarNuevoFormulario(
        this.mainForm.value.hacienda_id,
        this.mainForm.value.lote,
