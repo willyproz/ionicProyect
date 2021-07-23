@@ -14,7 +14,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 
 export class Sync {
   public storage: SQLiteObject;
-
+  public respuesta:any = {};
   constructor(private platform: Platform, private sqlite: SQLite, private httpClient: HttpClient, private sqlPorter: SQLitePorter) {
 
   }
@@ -31,7 +31,7 @@ export class Sync {
   }
 
 
- async  syncData(db) {
+ /*async  syncData(db) {
       await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda', {}).toPromise()
       .then( function (res) {
         console.log(res);
@@ -169,6 +169,94 @@ export class Sync {
         /*let mensaje = {estado: 'ok',  mensaje: 'asdasd'  };
         return mensaje;*/
 
-      })
+     /* })
+  }*/
+
+
+
+  syncData(db) {
+    this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda', {})
+    .subscribe(
+    async  (res)=>{
+    let resultadoProcesoSyncHacienda =  await this.procesoSyncHacienda(db,res);
+
+    let resultadoProcesoSyncUsuario =  await this.procesoSyncUsuario(db,res);
+
+    let resultadoProcesoSyncLote =  await this.procesoSyncLote(db,res);
+
+    console.log(resultadoProcesoSyncHacienda);
+    console.log(resultadoProcesoSyncUsuario);
+    console.log(resultadoProcesoSyncLote );
+      
+      }
+    )
+    
+  /*  
+    .toPromise()
+    .then( function (res) {
+    //  this.procesoSyncHacienda(db,res);
+      console.log('sadsd');
+
+     
+    });*/
+  }
+ 
+ async procesoSyncHacienda(db,res){
+   let resultado;
+    let deleteHcHacienda = 'DELETE FROM rk_hc_hacienda';
+    db.executeSql(deleteHcHacienda, []);
+    let l = res['rk_hc_hacienda'];
+    let p = l.map((l)=>`(${l.id},'${l.sigla}','${l.nombre}','${l.estado}')`).join(',');
+  await db.executeSql(`INSERT INTO rk_hc_hacienda (id,sigla,nombre,estado) VALUES ${p};`, {})
+    .then((resul)=>{
+      resultado = {estado: 'ok',mensaje: resul.rowsAffected }
+      }
+    ).catch((err)=>{ resultado = {estado: 'error',mensaje: err} });
+    return resultado;
+  }
+
+
+  async procesoSyncUsuario(db,res){
+    let resultado;
+     let deleteHcHacienda = 'DELETE FROM rk_hc_usuario';
+     db.executeSql(deleteHcHacienda, []);
+     let l = res['rk_hc_usuario'];
+     let p = l.map((l)=>`(${l.id},'${l.cedula}','${l.clave}','${l.correo}','${l.estado}','${l.exportador_id}','${l.fecha_cre}','${l.fecha_mod}','${l.nombre}','${l.ultimo_ingreso}','${l.usuario_cre_id}','${l.usuario_mod_id}')`).join(',');
+   await db.executeSql(`INSERT INTO rk_hc_usuario (id,cedula,clave,correo,estado,exportador_id,fecha_cre,fecha_mod,nombre,ultimo_ingreso,usuario_cre_id,usuario_mod_id) VALUES ${p};`, {})
+     .then((resul)=>{
+       resultado = {estado: 'ok',mensaje: resul.rowsAffected }
+       }
+     ).catch((err)=>{ resultado = {estado: 'error',mensaje: err} });
+     return resultado;
+   }
+
+   async procesoSyncLote(db,res){
+     let resultado;
+     let deleteHcHacienda = 'DELETE FROM rk_hc_lote';
+     db.executeSql(deleteHcHacienda, []);
+     let l = res['rk_hc_lote'];
+     let p = l.map((l)=>`('${l.estado}','${l.fecha_cre}','${l.fecha_mod}','${l.hacienda_id}',${l.id},'${l.lote}','${l.usuario_cre_id}','${l.usuario_mod_id}')`).join(',');
+   await db.executeSql(`INSERT INTO rk_hc_lote (estado,fecha_cre,fecha_mod,hacienda_id,id,lote,usuario_cre_id,usuario_mod_id) VALUES ${p};`, {})
+     .then((resul)=>{
+       resultado = {estado: 'ok',mensaje: resul.rowsAffected }
+       }
+     ).catch((err)=>{ resultado = {estado: 'error',mensaje: err} });
+     return resultado;
+   }
+
+
+
+
+
+
+
+
+  procesoSync(db,tabla,key,valor){
+      let deleteTable = 'DELETE FROM '+tabla;
+      db.executeSql(deleteTable, []).then(()=>{
+        db.executeSql(`INSERT INTO ${tabla} ${key} VALUES ${valor};`, {}).then(
+          console.log
+        );
+      }).catch((err)=>{return err});
   }
 }

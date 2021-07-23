@@ -53,17 +53,17 @@ export class FormularioPage {
    }
   data = new BehaviorSubject([]);
  async syncronize(){
-    let loading = await this.loadingCtrl.create({
+  /*  let loading = await this.loadingCtrl.create({
       cssClass: 'my-custom-class',
       spinner:'dots',
       message: 'Sincronizando datos por favor espere...',
-    });
-    this.loading(true,loading);
+    });*/
+   // this.loading(true,loading);
     this.db.openOrCreateDB().then( res => {
-      this.db.syncData(res).then((r)=>{
+      this.db.syncData(res);/*.then((r)=>{
         this.loading(false,loading);
       }
-      );
+      );*/
     });
 
   }
