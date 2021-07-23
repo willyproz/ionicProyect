@@ -17,23 +17,25 @@ export class ActionSheetPage implements OnInit {
     private activatedRoute: ActivatedRoute
   ) { }
   Data: any[] = [];
-  titulo:string = '';
+  FormStruct: any[] = [];
+  titulo: string = '';
   ngOnInit() {
-  /*  this.db.dbState().subscribe((res) => {
-      if(res){
-        this.db.fetchFormulario().subscribe(item => {
-          this.Data = item
-        })
-      }
-    });*/
+    /*  this.db.dbState().subscribe((res) => {
+        if(res){
+          this.db.fetchFormulario().subscribe(item => {
+            this.Data = item
+          })
+        }
+      });*/
     let sigla = this.activatedRoute.snapshot.paramMap.get('id');
     //console.log(sigla);
-
+    //this.Data = item;
     this.dbQuery.openOrCreateDB().then(db => {
-      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_tipo_formulario_cab fc LEFT JOIN rk_hc_tipo_formulario_det fd on fc.id = fd.tipo_formulario_cab_id WHERE sigla = ?',sigla)
+      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_tipo_formulario_cab fc LEFT JOIN rk_hc_tipo_formulario_det fd on fc.id = fd.tipo_formulario_cab_id WHERE sigla = ?', sigla)
         .then(item => {
           this.titulo = item[0].nombre_formulario;
-          this.Data = item;
+          console.log(item);
+          this.FormStruct = item;
         });
     });
 
@@ -51,17 +53,16 @@ export class ActionSheetPage implements OnInit {
 
 
 
-  cnt:number = 0;
+  cnt: number = 0;
 
-  btnAnterior(){
-    if (this.cnt > 0)
-    {
+  btnAnterior() {
+    if (this.cnt > 0) {
       --this.cnt;
       var inactivos = document.getElementsByClassName("fma");
-        for (var i = 0; i<inactivos.length; i++) {
-          inactivos[i].classList.add("hidden");
-        }
-      var el = document.getElementById('ma'+this.cnt)!;
+      for (var i = 0; i < inactivos.length; i++) {
+        inactivos[i].classList.add("hidden");
+      }
+      var el = document.getElementById('ma' + this.cnt)!;
       el.classList.remove("hidden");
 
       /*$('.fma').addClass('hidden');
@@ -70,17 +71,16 @@ export class ActionSheetPage implements OnInit {
     console.log(this.cnt);
   }
 
-  btnSiguiente(){
-    var cntInput:any = ((document.getElementById('cntForm') as HTMLInputElement).value);
-    if (this.cnt < cntInput)
-    {
+  btnSiguiente() {
+    var cntInput: any = ((document.getElementById('cntForm') as HTMLInputElement).value);
+    if (this.cnt < cntInput) {
       this.cnt++;
       var inactivos = document.getElementsByClassName("fma");
-      for (var i = 0; i<inactivos.length; i++) {
+      for (var i = 0; i < inactivos.length; i++) {
         inactivos[i].classList.add("hidden");
       }
-    var el = document.getElementById('ma'+this.cnt)!;
-    el.classList.remove("hidden");
+      var el = document.getElementById('ma' + this.cnt)!;
+      el.classList.remove("hidden");
     }
     console.log(this.cnt);
   }

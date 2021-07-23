@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { LoadingController } from '@ionic/angular';
 
 import Swal from 'sweetalert2';
 
@@ -7,7 +8,7 @@ import Swal from 'sweetalert2';
 })
 export class MsgTemplateService {
 
-  constructor() { }
+  constructor(public loadingCtrl: LoadingController) { }
 
 
   msgOk(){
@@ -22,5 +23,22 @@ export class MsgTemplateService {
 
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");
+  }
+
+  async loadingCreate(msg:string){
+    let loading = await this.loadingCtrl.create({
+      cssClass: 'my-custom-class',
+      spinner:'dots',
+      message: msg
+    });
+    return loading;
+  }
+
+  async loading(inicio,loading) {
+    if(inicio === true){
+      await loading.present();
+    }else if(inicio === false){
+      await loading.dismiss();
+    }
   }
 }

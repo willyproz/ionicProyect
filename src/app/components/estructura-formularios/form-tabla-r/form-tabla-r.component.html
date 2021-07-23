@@ -1,3 +1,69 @@
-<p>
-  form-tabla-r works!
-</p>
+<style>
+  .header-fixed {
+    position: relative;
+    max-height: 100%;
+  }
+  .header-fixed thead {
+    position: sticky !important;
+    top: 0;
+    z-index: 10;
+  }
+</style>
+
+<div class="panel panel-primary">
+  <div class="panel-heading p5">
+    <h6 class="text-center no-margin">{{ titulo }}</h6>
+  </div>
+  <div class="panel-body p5">
+    <form id="form-rama-<?= $tipo ?>" method="POST" action="#">
+      <input type="hidden" name="tipo_pag" value="{{ tipo }}">
+      <input type="hidden" name="tipo_ubicacion" value="R">
+      <div>
+        <div class="pre-scrollable">
+          <table class="header-fixed table table-striped table-bordered no-padding">
+            <thead>
+              <tr class="i" style="color: white; background: #0277bd; background-color: #0277bd;">
+                <th rowspan="2">
+                  <p class="text-center p5 no-margin">#</p>
+                </th>
+                <th *ngFor="let itemHeadCuadrante of headCuadranteTable;" colspan="2">
+                  <p class="text-center p5 no-margin">{{itemHeadCuadrante}}</p>
+                </th>
+              </tr>
+              <tr class="i" style="color: white; background: #0277bd; background-color: #0277bd;">
+                <ng-container *ngFor="let itemHeadCuadrante of headCuadranteTable;">
+                  <th *ngFor="let itemHeadRama of headRamaTable;" colspan="1">
+                    <p class="text-center p5 no-margin"> {{ itemHeadRama}} </p>
+                  </th>
+                </ng-container>
+              </tr>
+            </thead>
+            <tbody id="InputCalidad">
+              <tr *ngFor="let itemLinea of maxLineas;let iml = index">
+                <td>
+                  <p class="text-center p5 no-margin">{{ itemLinea }}</p>
+                </td>
+                <ng-container *ngFor="let itemHeadCuadrante of headCuadranteTable;">
+                  <td *ngFor="let itemHeadRama of headRamaTable;">
+                    <p class="text-center p5 no-margin ">
+                      <ion-select placeholder="-----">
+                        <ion-select-option *ngFor="let itemNotas of maxNotas;let inc = index" value="{{itemNotas}}">
+                          {{itemNotas}}</ion-select-option>
+                      </ion-select>
+                    </p>
+                  </td>
+                </ng-container>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="col-xs-12 text-center">
+  <ion-button type="submit" size="large" color="tertiary" expand="block">
+    <ion-icon name="checkmark-outline"></ion-icon>
+    Grabar
+  </ion-button>
+</div>
