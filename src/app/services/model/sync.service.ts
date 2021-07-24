@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
 import { catchError, map, tap } from 'rxjs/operators';
-
+import { MsgTemplateService } from 'src/app/services/utilitarios/msg-template.service';
 
 
 @Injectable({
@@ -15,7 +15,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 export class Sync {
   public storage: SQLiteObject;
   public respuestaSync: any = '';
-  constructor(private platform: Platform, private sqlite: SQLite, private httpClient: HttpClient, private sqlPorter: SQLitePorter) {
+  constructor(private platform: Platform, private sqlite: SQLite, private msgService: MsgTemplateService, private httpClient: HttpClient, private sqlPorter: SQLitePorter) {
 
   }
 
@@ -178,32 +178,26 @@ export class Sync {
     await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda', {})
       .toPromise().then(
         async (res) => {
-
+          let resultado = '';
           let resultadoProcesoSyncHacienda = await this.procesoSyncHacienda(db, res);
 
+          resultado += ' HcHacienda: '+resultadoProcesoSyncHacienda.estado+' | '+resultadoProcesoSyncHacienda.mensaje;
           let resultadoProcesoSyncUsuario = await this.procesoSyncUsuario(db, res);
-
+          resultado +='HcUsuario: '+resultadoProcesoSyncUsuario.estado+' | '+resultadoProcesoSyncUsuario.mensaje;
           let resultadoProcesoSyncLote = await this.procesoSyncLote(db, res);
-
+          resultado +='HcLote: '+resultadoProcesoSyncLote.estado+' | '+resultadoProcesoSyncLote.mensaje;
           let resultadoProcesoSyncLoteDet = await this.procesoSyncLoteDet(db, res);
-
+          resultado +='HcLoteDet: '+resultadoProcesoSyncLoteDet.estado+' | '+resultadoProcesoSyncLoteDet.mensaje;
           let resultadoProcesoSyncFomularioCab = await this.procesoSyncFomularioCab(db, res);
-
+          resultado +='HcFormCab: '+resultadoProcesoSyncFomularioCab.estado+' | '+resultadoProcesoSyncFomularioCab.mensaje;
           let resultadoProcesoSyncFomularioDet = await this.procesoSyncFomularioDet(db, res);
-
+          resultado +='HcFormDet: '+resultadoProcesoSyncFomularioDet.estado+' | '+resultadoProcesoSyncFomularioDet.mensaje;
           let resultadoProcesoSyncTipoMuestra = await this.procesoSyncTipoMuestra(db, res);
+          resultado +='HcTipoMuestra: '+resultadoProcesoSyncTipoMuestra.estado+' | '+resultadoProcesoSyncTipoMuestra.mensaje;
+          this.msgService.msgError(resultado);
 
         }
       );
-
-    /*
-      .toPromise()
-      .then( function (res) {
-      //  this.procesoSyncHacienda(db,res);
-        console.log('sadsd');
-
-
-      });*/
   }
 
   async procesoSyncHacienda(db, res) {

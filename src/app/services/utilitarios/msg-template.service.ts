@@ -19,7 +19,7 @@ export class MsgTemplateService {
   }
 
   msgError(msg:string){
-    Swal.fire("ERROR",msg,'success');
+    Swal.fire("ERROR",msg,'error');
 
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");
