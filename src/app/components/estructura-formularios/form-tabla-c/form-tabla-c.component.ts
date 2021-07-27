@@ -20,7 +20,6 @@ export class FormTablaCComponent implements OnInit {
     this.maxLineas = Object.assign([], []);
     this.maxCuadrantes = Object.assign([], []);
     this.maxNotas = Object.assign([], []);
- //   console.log(_data.id);
 
     this.titulo = _data.nombre;
 

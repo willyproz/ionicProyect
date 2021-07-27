@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { DbService } from 'src/app/services/model/db.service';
+import { DbService } from '../../services/model/db.service';
+import { ModalController } from '@ionic/angular';
+import { AlertPage } from '../alert/alert.page';
+import { Router } from '@angular/router';
+import { DbQuery } from 'src/app/services/model/dbQuerys.service';
 
 @Component({
   selector: 'app-inicio',
@@ -8,9 +12,10 @@ import { DbService } from 'src/app/services/model/db.service';
 })
 export class InicioPage implements OnInit {
 
-  constructor(private Dbservices:DbService) { }
+  constructor(private dbQuery:DbQuery ,public modalController: ModalController,private Dbservices:DbService,private router: Router) {}
 
   ngOnInit() {
+   
   }
 
   menuTemp   = [
@@ -19,4 +24,16 @@ export class InicioPage implements OnInit {
     {'nombre':  'FORMULARIOS', 'icono' : 'eye', 'clase' : 'Planta', 'ruta' : '/formulario', 'estado': 'disabled'},
  ];
 
+ async presentModal() {
+  const modal = await this.modalController.create({
+    component: AlertPage
+  });
+  await modal.present();
+  }
+
+
+  logout(){
+    localStorage.removeItem('token');
+    this.router.navigateByUrl('/login');
+  }
 }

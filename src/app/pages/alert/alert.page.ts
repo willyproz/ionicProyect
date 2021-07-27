@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-alert',
@@ -7,9 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AlertPage implements OnInit {
 
-  constructor() { }
+  constructor(public modalController: ModalController) { }
 
   ngOnInit() {
   }
 
+  cerrarModal() {
+    console.log('asd');
+    this.modalController.dismiss();
+  }
 }

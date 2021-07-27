@@ -225,6 +225,31 @@
     </div>
   <div class="limpiar"></div>
 </div>
-
-
 </ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-tabs class="tabs-bottom">
+      <ion-tab-bar slot="bottom">
+        <ion-tab-button (click)="presentModal()">
+          <ion-icon name="person"></ion-icon>
+          <ion-label>Perfil</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button >
+          <ion-icon name="cloud-download"></ion-icon>
+          <ion-label>Sincronizar dispositivo</ion-label>
+        </ion-tab-button>
+  
+        <ion-tab-button >
+          <ion-icon name="cloud-upload"></ion-icon>
+          <ion-label>Subir Registros</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button (click)="logout()">
+          <ion-icon color="danger" name="exit"></ion-icon>
+          <ion-label>Salir</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+    </ion-tabs>
+  </ion-toolbar>
+</ion-footer>

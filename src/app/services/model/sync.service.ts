@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
-import { catchError, map, tap } from 'rxjs/operators';
-import { MsgTemplateService } from 'src/app/services/utilitarios/msg-template.service';
+import { MsgTemplateService } from '../utilitarios/msg-template.service';
 
 
 @Injectable({
@@ -172,32 +170,72 @@ export class Sync {
   /* })
 }*/
 
-
-
   async syncData(db) {
-    await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda', {})
+    await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda',{
+      headers:
+        new HttpHeaders(
+          {
+            'origin': 'http://localhost:8000',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,DELETE,PUT'
+          }
+        )
+    })
       .toPromise().then(
         async (res) => {
-          let resultado = '';
+          let resultado = 'ok';
+          let mensaje = 'Datos sincronizados con exito';
+
           let resultadoProcesoSyncHacienda = await this.procesoSyncHacienda(db, res);
+          if(resultadoProcesoSyncHacienda.estado === 'error'){
+            resultado = 'error';
+            mensaje = resultadoProcesoSyncHacienda.mensaje;
+          }
 
-          resultado += ' HcHacienda: '+resultadoProcesoSyncHacienda.estado+' | '+resultadoProcesoSyncHacienda.mensaje;
           let resultadoProcesoSyncUsuario = await this.procesoSyncUsuario(db, res);
-          resultado +='HcUsuario: '+resultadoProcesoSyncUsuario.estado+' | '+resultadoProcesoSyncUsuario.mensaje;
-          let resultadoProcesoSyncLote = await this.procesoSyncLote(db, res);
-          resultado +='HcLote: '+resultadoProcesoSyncLote.estado+' | '+resultadoProcesoSyncLote.mensaje;
-          let resultadoProcesoSyncLoteDet = await this.procesoSyncLoteDet(db, res);
-          resultado +='HcLoteDet: '+resultadoProcesoSyncLoteDet.estado+' | '+resultadoProcesoSyncLoteDet.mensaje;
-          let resultadoProcesoSyncFomularioCab = await this.procesoSyncFomularioCab(db, res);
-          resultado +='HcFormCab: '+resultadoProcesoSyncFomularioCab.estado+' | '+resultadoProcesoSyncFomularioCab.mensaje;
-          let resultadoProcesoSyncFomularioDet = await this.procesoSyncFomularioDet(db, res);
-          resultado +='HcFormDet: '+resultadoProcesoSyncFomularioDet.estado+' | '+resultadoProcesoSyncFomularioDet.mensaje;
-          let resultadoProcesoSyncTipoMuestra = await this.procesoSyncTipoMuestra(db, res);
-          resultado +='HcTipoMuestra: '+resultadoProcesoSyncTipoMuestra.estado+' | '+resultadoProcesoSyncTipoMuestra.mensaje;
-          this.msgService.msgError(resultado);
+          if(resultadoProcesoSyncUsuario.estado === 'error'){
+            resultado = 'error';
+            mensaje = resultadoProcesoSyncUsuario.mensaje;
+          }
 
-        }
-      );
+          let resultadoProcesoSyncLote = await this.procesoSyncLote(db, res);
+          if(resultadoProcesoSyncLote.estado === 'error'){
+            resultado = 'error';
+            mensaje = resultadoProcesoSyncLote.mensaje;
+          }
+
+          let resultadoProcesoSyncLoteDet = await this.procesoSyncLoteDet(db, res);
+          if(resultadoProcesoSyncLoteDet.estado === 'error'){
+            resultado = 'error';
+            mensaje = resultadoProcesoSyncLoteDet.mensaje;
+          }
+
+          let resultadoProcesoSyncFomularioCab = await this.procesoSyncFomularioCab(db, res);
+          if(resultadoProcesoSyncFomularioCab.estado === 'error'){
+            resultado = 'error';
+            mensaje = resultadoProcesoSyncFomularioCab.mensaje;
+          }
+
+          let resultadoProcesoSyncFomularioDet = await this.procesoSyncFomularioDet(db, res);
+          if(resultadoProcesoSyncFomularioDet.estado === 'error'){
+            resultado = 'error';
+            mensaje = resultadoProcesoSyncFomularioDet.mensaje;
+          }
+
+          let resultadoProcesoSyncTipoMuestra = await this.procesoSyncTipoMuestra(db, res);
+          if(resultadoProcesoSyncTipoMuestra.estado === 'error'){
+            resultado = 'error';
+            mensaje = resultadoProcesoSyncTipoMuestra.mensaje;
+          }
+          
+          if(resultado === 'ok'){
+            this.msgService.msgInfo(mensaje);
+          }else{
+            this.msgService.msgError(mensaje);
+          }
+          
+        });
   }
 
   async procesoSyncHacienda(db, res) {
@@ -299,12 +337,12 @@ export class Sync {
     return resultado;
   }
 
-  procesoSync(db, tabla, key, valor) {
+  /*procesoSync(db, tabla, key, valor) {
     let deleteTable = 'DELETE FROM ' + tabla;
     db.executeSql(deleteTable, []).then(() => {
       db.executeSql(`INSERT INTO ${tabla} ${key} VALUES ${valor};`, {}).then(
         console.log
       );
     }).catch((err) => { return err });
-  }
+  }*/
 }

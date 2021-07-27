@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { ValidarLoginGuard } from './guards/validar-login.guard';
 
 const routes: Routes = [
     {
     path: '',
-    redirectTo: 'inicio',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
   {
@@ -26,6 +27,10 @@ const routes: Routes = [
   {
     path: 'consulta',
     loadChildren: () => import('./pages/consulta/consulta.module').then( m => m.ConsultaPageModule)
+  },
+  {
+    path: 'login',
+    loadChildren: () => import('./pages/login/login.module').then( m => m.LoginPageModule)
   }
 ];
 

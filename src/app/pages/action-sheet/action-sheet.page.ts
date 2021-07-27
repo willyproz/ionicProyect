@@ -20,22 +20,13 @@ export class ActionSheetPage implements OnInit {
   FormStruct: any[] = [];
   titulo: string = '';
   ngOnInit() {
-    /*  this.db.dbState().subscribe((res) => {
-        if(res){
-          this.db.fetchFormulario().subscribe(item => {
-            this.Data = item
-          })
-        }
-      });*/
     let sigla = this.activatedRoute.snapshot.paramMap.get('id');
-    //console.log(sigla);
-    //this.Data = item;
     this.dbQuery.openOrCreateDB().then(db => {
-      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_tipo_formulario_cab fc LEFT JOIN rk_hc_tipo_formulario_det fd on fc.id = fd.tipo_formulario_cab_id WHERE sigla = ?', sigla)
+      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_tipo_formulario_cab fc LEFT JOIN rk_hc_tipo_formulario_det fd on fc.id = fd.tipo_formulario_cab_id WHERE fc.sigla = ?', sigla)
         .then(item => {
           this.titulo = item[0].nombre_formulario;
-       //   console.log(item);
           this.FormStruct = item;
+          console.log(item);
         });
     });
 

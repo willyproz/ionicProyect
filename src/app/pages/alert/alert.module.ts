@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { AlertPageRoutingModule } from './alert-routing.module';
-
+import { ComponentsModule } from 'src/app/components/components.module';
 import { AlertPage } from './alert.page';
 
 @NgModule({
@@ -13,7 +13,8 @@ import { AlertPage } from './alert.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    AlertPageRoutingModule
+    AlertPageRoutingModule,
+    ComponentsModule
   ],
   declarations: [AlertPage]
 })

@@ -18,6 +18,13 @@ export class MsgTemplateService {
     el.classList.remove("swal2-height-auto");
   }
 
+  msgInfo(msg:string ='Datos grabados con exito'){
+    Swal.fire("OK",msg,'info');
+
+    var el = document.querySelector('body')!;
+    el.classList.remove("swal2-height-auto");
+  }
+
   msgError(msg:string){
     Swal.fire("ERROR",msg,'error');
 

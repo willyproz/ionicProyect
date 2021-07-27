@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from "@angular/forms";
-import { MsgTemplateService } from 'src/app/services/utilitarios/msg-template.service';
-//import { FormulariosService } from 'src/app/services/model/formularios.service';
+import { MsgTemplateService } from '../../../services/utilitarios/msg-template.service';
 import { DbQuery } from '../../../services/model/dbQuerys.service';
 
 @Component({
@@ -15,9 +14,10 @@ export class FormInicioComponent implements OnInit {
   constructor(
     public formBuilder: FormBuilder,
     private dbQuery: DbQuery,
-    //  private formulario:FormulariosService,
     private msg: MsgTemplateService
-  ) { }
+  ) {
+    
+   }
 
   SelectHacienda: any[] = [];
   SelectUsuario: any[] = [];
@@ -36,30 +36,30 @@ export class FormInicioComponent implements OnInit {
 
 
     this.dbQuery.openOrCreateDB().then(db => {
-      this.dbQuery.consultaAll(db, 'SELECT id as codigo, nombre as descripcion  FROM rk_hc_hacienda order by nombre asc')
+      this.dbQuery.consultaAll(db, 'SELECT id as codigo, nombre as descripcion  FROM rk_hc_hacienda  WHERE estado = ?', 'A')
         .then(item => {
           this.SelectHacienda = item;
         });
 
 
-      this.dbQuery.consultaAll(db, 'SELECT id as codigo, nombre as descripcion FROM rk_hc_usuario order by nombre asc')
+      this.dbQuery.consultaAll(db, 'SELECT id as codigo, nombre as descripcion FROM rk_hc_usuario WHERE estado = ?', 'A')
         .then(item => {
           this.SelectUsuario = item;
         });
 
 
-      this.dbQuery.consultaAll(db, 'SELECT id as codigo, lote as descripcion FROM rk_hc_lote')
+      this.dbQuery.consultaAll(db, 'SELECT id as codigo, lote as descripcion FROM rk_hc_lote WHERE estado = ?', 'A')
         .then(item => {
           this.SelectLote = item;
         });
 
 
-      this.dbQuery.consultaAll(db, 'SELECT id as codigo, modulo as descripcion  FROM rk_hc_lote_det')
+      this.dbQuery.consultaAll(db, 'SELECT id as codigo, modulo as descripcion  FROM rk_hc_lote_det WHERE estado = ?', 'A')
         .then(item => {
           this.SelectModulo = item;
         });
 
-      this.dbQuery.consultaAll(db, 'SELECT id as codigo, nombre as descripcion FROM rk_hc_tipo_muestra')
+      this.dbQuery.consultaAll(db, 'SELECT id as codigo, nombre as descripcion FROM rk_hc_tipo_muestra WHERE estado = ?', 'A')
         .then(item => {
           this.SelectTipoMuestra = item;
         });

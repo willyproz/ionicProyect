@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { Sync } from 'src/app/services/model/sync.service';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { MsgTemplateService } from 'src/app/services/utilitarios/msg-template.service';
+import { Sync } from '../../services/model/sync.service';
+import { BehaviorSubject } from 'rxjs';
+import { MsgTemplateService } from '../../services/utilitarios/msg-template.service';
+import { DbService } from '../../services/model/db.service';
 
 interface Componente {
   icon: string;
@@ -50,8 +51,8 @@ export class FormularioPage {
   ];*/
 
 
-  constructor(private db: Sync, private msgService: MsgTemplateService) {
-    this.syncronize();
+  constructor(private db: Sync, private msgService: MsgTemplateService, private db2:DbService) {
+    //this.syncronize();
   }
   data = new BehaviorSubject([]);
 

@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
-import { catchError, map, tap } from 'rxjs/operators';
 
 import { rk_hc_form_cab } from '../../model/rk_hc_form_cab';
 
@@ -21,7 +20,7 @@ export class DbService {
 
   public respuesta: any;
 
-  constructor(private platform: Platform,private sqlite: SQLite,private httpClient: HttpClient, private sqlPorter: SQLitePorter)
+  constructor(private platform: Platform, private sqlite: SQLite,private httpClient: HttpClient, private sqlPorter: SQLitePorter)
   {
     this.platform.ready().then(() => {
       this.sqlite.create({
