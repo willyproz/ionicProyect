@@ -15,7 +15,7 @@ import {Md5} from 'ts-md5/dist/md5';
 export class LoginPage implements OnInit {
 
   constructor( private fb: FormBuilder,
-               private router: Router, 
+               private router: Router,
                private msg: MsgTemplateService,
                private dbquery: DbQuery,
                private Dbservices:DbService,
@@ -24,26 +24,25 @@ export class LoginPage implements OnInit {
                 this.syncronize();
                 }
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ionViewWillEnter() {
+    this.syncronize();
+    this.Formulario.reset();
+    //console.log('soy el viewWillEnter');
   }
- 
 
   Formulario: FormGroup = this.fb.group({
     email: ['',[Validators.required, Validators.minLength(6)]],
     password: ['',[Validators.required, Validators.minLength(6)]],
   });
-  
-  miFormulario: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.minLength(6)]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
-  });
 
  async login(){
-  
+
     if(this.Formulario.valid === true){
       const {email, password}= this.Formulario.value;
       let clave = Md5.hashStr(password);
-      let sql = 'SELECT COUNT(*) as cnt FROM rk_hc_usuario WHERE correo = "'+email+'"  and clave = "'+clave+'"'
+      let sql = 'SELECT COUNT(*) as cnt, nombre,id FROM rk_hc_usuario WHERE correo = "'+email+'"  and clave = "'+clave+'"'
      await this.dbquery.openOrCreateDB().then((db)=>{
         this.dbquery.consultaLogin(db,sql)
         .then( async (res)=>{
@@ -53,6 +52,8 @@ export class LoginPage implements OnInit {
             let token = emailCodec+clave;
            await localStorage.setItem('token',token);
            await localStorage.setItem('user',email);
+           await localStorage.setItem('nombre',res[0].nombre);
+           await localStorage.setItem('id_usuario',res[0].id);
             this.router.navigateByUrl('/inicio');
             this.msg.msgOk('Inicio de sesión exitoso.');
           }else{
@@ -68,7 +69,7 @@ export class LoginPage implements OnInit {
 
 
 
-    
+
 //  this.syncronize();
  // data = new BehaviorSubject([]);
 

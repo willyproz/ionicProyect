@@ -228,13 +228,13 @@ export class Sync {
             resultado = 'error';
             mensaje = resultadoProcesoSyncTipoMuestra.mensaje;
           }
-          
+
           if(resultado === 'ok'){
             this.msgService.msgInfo(mensaje);
           }else{
             this.msgService.msgError(mensaje);
           }
-          
+
         });
   }
 

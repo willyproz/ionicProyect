@@ -4,6 +4,8 @@ import { ModalController } from '@ionic/angular';
 import { AlertPage } from '../alert/alert.page';
 import { Router } from '@angular/router';
 import { DbQuery } from 'src/app/services/model/dbQuerys.service';
+import { Sync } from 'src/app/services/model/sync.service';
+import { MsgTemplateService } from 'src/app/services/utilitarios/msg-template.service';
 
 @Component({
   selector: 'app-inicio',
@@ -12,10 +14,16 @@ import { DbQuery } from 'src/app/services/model/dbQuerys.service';
 })
 export class InicioPage implements OnInit {
 
-  constructor(private dbQuery:DbQuery ,public modalController: ModalController,private Dbservices:DbService,private router: Router) {}
+  constructor(private dbQuery:DbQuery ,
+              public modalController: ModalController,
+              private msg: MsgTemplateService,
+              private Dbservices:DbService,
+              private router: Router,
+              private sync: Sync
+              ) {}
 
   ngOnInit() {
-   
+
   }
 
   menuTemp   = [
@@ -32,8 +40,19 @@ export class InicioPage implements OnInit {
   }
 
 
+  async syncronize() {
+    let loading = await this.msg.loadingCreate('Sincronizando datos por favor espere...');
+    this.msg.loading(true, loading)
+    this.sync.openOrCreateDB().then(res => {
+      this.sync.syncData(res).then(() => {
+        this.msg.loading(false, loading)
+      });
+    });
+  }
+
   logout(){
-    localStorage.removeItem('token');
-    this.router.navigateByUrl('/login');
+    localStorage.clear();//('token');
+    this.router.navigate(['/login'])
+    //this.router.navigateByUrl('/login');
   }
 }

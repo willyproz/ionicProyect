@@ -7,7 +7,7 @@
     padding: 0;
   }
 
-  
+
   .container-login{
     background-image: url('assets/bg-01.JPG');
     background-repeat: no-repeat;
@@ -18,7 +18,7 @@
     width: 100%;
     height: 100%;
   }
-  
+
   .login-logo1{
     height: 100%;
     text-align: center;
@@ -31,7 +31,7 @@
   .login {
     overflow: hidden;
     background-color: #ffe872;
-    padding: 40px 30px 30px 30px;
+    padding: 30px 30px 30px 30px;
     border-radius: 10px;
     position: absolute;
     top: 50%;
@@ -89,7 +89,7 @@
     transition: transform 300ms, box-shadow 300ms;
     box-shadow: 5px 10px 10px rgba(255, 212, 0, 0.2);
   }
-  
+
   .mensajeError {
     overflow: hidden;
     padding: 10px;
@@ -207,32 +207,34 @@
 </style>
 <ion-content>
   <div class="container-login" ></div>
-  
+
   <form role="form" class="loginLogo" action="#" method="post">
       <img class="login-logo1" src="./assets/LogoDUREXPORTAnew.png">
   </form>
-    
-  <form class="login" 
-        autocomplete="off" 
+
+  <form class="login"
+        autocomplete="off"
         [formGroup]="Formulario"
         (ngSubmit)='login()'
      >
-  
-      <input 
-          type="email" 
+     <ion-button expand="full" color="dark" (click)="syncronize()"><ion-icon name="sync-outline"></ion-icon> Sincronizar</ion-button>
+      <input
+          type="email"
           formControlName="email"
           placeholder="Ingrese su usuario o correo">
-  
-      <input 
-          type="password" 
+
+      <input
+          type="password"
           formControlName="password"
           placeholder="Ingrese su contraseña">
-  
-      <button 
-          value="Ingresar" 
+
+      <button
+          value="Ingresar"
           type="submit"
           >
           Ingresar
       </button>
+
   </form>
+
 </ion-content>

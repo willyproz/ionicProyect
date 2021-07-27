@@ -1,10 +1,10 @@
-<form [formGroup]="mainForm" (ngSubmit)="insertarFormulario()">
+<form [formGroup]="Formulario" (ngSubmit)="insertarFormulario()">
 <ion-row>
   <ion-col class="ion-align-self-start">
     <ion-item>
       <ion-label>Responsable</ion-label>
-      <ion-select formControlName="responsable" placeholder="Seleccionar responsable" interface="action-sheet">
-        <ion-select-option *ngFor="let value of SelectUsuario" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
+      <ion-select [disabled]="true" [(ngModel)]="SelectUsuario[0].codigo"  formControlName="responsable_id" interface="action-sheet">
+        <ion-select-option selectedText *ngFor="let value of SelectUsuario" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
       </ion-select>
     </ion-item>
   </ion-col>
@@ -21,7 +21,7 @@
   <ion-col class="ion-align-self-start">
     <ion-item>
       <ion-label>Lote</ion-label>
-      <ion-select formControlName="lote" placeholder="Seleccionar lote" interface="action-sheet">
+      <ion-select formControlName="lote_id" placeholder="Seleccionar lote" interface="action-sheet">
         <ion-select-option *ngFor="let value of SelectLote" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
       </ion-select>
     </ion-item>
@@ -29,7 +29,7 @@
   <ion-col class="ion-align-self-center">
     <ion-item>
       <ion-label>Modulo</ion-label>
-      <ion-select formControlName="modulo" placeholder="Seleccionar modulo" interface="action-sheet">
+      <ion-select formControlName="modulo_id" placeholder="Seleccionar modulo" interface="action-sheet">
         <ion-select-option *ngFor="let value of SelectModulo" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
       </ion-select>
     </ion-item>

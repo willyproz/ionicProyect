@@ -54,6 +54,25 @@ export class DbQuery {
     });
   }
 
+  public respuesta:any;
+
+  insertar(db,sql,data) {
+    return db.executeSql(sql, data)
+    .then(res => {
+      if(res.rowsAffected > 0){
+        this.respuesta={
+          estado:'ok',
+          mensaje: 'Columnas afectadas: '+res.rowsAffected + ' , Id insertado: '+res.insertId
+        }
+      }else{
+        this.respuesta={
+          estado:'error',
+          mensaje: res
+        }
+      }
+    });
+  }
+
   async  validarLogin(){
     let email = localStorage.getItem('user');
     let  db = await this.openOrCreateDB();

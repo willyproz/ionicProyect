@@ -8,7 +8,13 @@ import { ModalController } from '@ionic/angular';
 })
 export class AlertPage implements OnInit {
 
-  constructor(public modalController: ModalController) { }
+  public correo:string;
+  public nombre:string;
+  constructor(public modalController: ModalController)
+  {
+   this.correo =   localStorage.getItem('user');
+   this.nombre =   localStorage.getItem('nombre');
+  }
 
   ngOnInit() {
   }
