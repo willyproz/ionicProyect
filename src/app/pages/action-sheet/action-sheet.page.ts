@@ -26,7 +26,6 @@ export class ActionSheetPage implements OnInit {
         .then(item => {
           this.titulo = item[0].nombre_formulario;
           this.FormStruct = item;
-          console.log(item);
         });
     });
 

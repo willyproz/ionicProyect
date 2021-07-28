@@ -56,3 +56,35 @@
     </ion-col>
 </ion-row>
 </form>
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading text-center"><b>FORMULARIOS {{ tituloTabla}}</b></div>
+  <div class="panel-body"></div>
+  <!-- Table -->
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>HACIENDA</th>
+        <th>MUESTRA</th>
+        <th>LOTE</th>
+        <th>MODULO</th>
+        <th>USUARIO CRE</th>
+        <th>FECHA CRE</th>
+        <th>LIQUIDADO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of TablaFormularioCab">
+        <td>{{data.id}}</td>
+        <td>{{data.hacienda}}</td>
+        <td>{{data.tipo_muestra}}</td>
+        <td>L{{data.lote}}</td>
+        <td>M{{data.modulo}}</td>
+        <td>{{data.usuario_cre}}</td>
+        <td>{{data.fecha_cre}}</td>
+        <td>{{data.liquidado}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

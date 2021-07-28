@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { MsgTemplateService } from '../../../services/utilitarios/msg-template.service';
 import { DbQuery } from '../../../services/model/dbQuerys.service';
-import { Router } from '@angular/router';
+import { MyUserService } from '../../../services/utilitarios/myUser.service';
 
 @Component({
   selector: 'app-form-inicio',
@@ -12,11 +12,12 @@ import { Router } from '@angular/router';
 
 export class FormInicioComponent implements OnInit {
 
+  @Input() tituloTabla: string = '';
   constructor(
     public formBuilder: FormBuilder,
     private dbQuery: DbQuery,
     private msg: MsgTemplateService,
-    private router: Router
+    private MyUser: MyUserService
   ) {
     this.SelectUsuario = [
       {
@@ -24,13 +25,10 @@ export class FormInicioComponent implements OnInit {
         descripcion: localStorage.getItem('nombre'),
       }
     ]
-
-    this.dbQuery.validarLogin().subscribe(console.log);
   }
-  
-  
+
+
   ionViewWillEnter() {
-    this.dbQuery.validarLogin().subscribe(console.log);
   }
 
   SelectHacienda: any[] = [];
@@ -38,6 +36,7 @@ export class FormInicioComponent implements OnInit {
   SelectLote: any[] = [];
   SelectModulo: any[] = [];
   SelectTipoMuestra: any[] = [];
+  TablaFormularioCab: any[] = [];
 
   ngOnInit() {
 
@@ -49,6 +48,7 @@ export class FormInicioComponent implements OnInit {
       tipo_muestra_id: ['']
     });
 
+    this.consultarTabla();
 
     this.dbQuery.openOrCreateDB().then(db => {
       this.dbQuery.consultaAll(db, 'SELECT id as codigo, nombre as descripcion  FROM rk_hc_hacienda  WHERE estado = ?', 'A')
@@ -80,9 +80,16 @@ export class FormInicioComponent implements OnInit {
         });
 
     })
+  }
 
-
-
+  consultarTabla() {
+    this.dbQuery.openOrCreateDB().then(db => {
+      let sql = 'SELECT ca.id, rhh.nombre as hacienda, ca.lote,ca.modulo, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.estado = ?';
+      this.dbQuery.consultaAll(db, sql, 'A')
+        .then(item => {
+          this.TablaFormularioCab = item;
+        });
+    });
   }
 
   Formulario: FormGroup = this.formBuilder.group({
@@ -93,31 +100,35 @@ export class FormInicioComponent implements OnInit {
     tipo_muestra_id: ['', [Validators.required, Validators.minLength(6), Validators.pattern('[0-9]')]]
   });
 
-  
+
 
 
 
   insertarFormulario() {
     console.log(this.Formulario.value);
     console.log(this.Formulario.valid);
-
     this.msg.msgConfirmar().then((result) => {
-     
+
       if (result.isConfirmed) {
         if (this.Formulario.valid === true) {
-          let data = [this.Formulario.value.hacienda_id,
-          this.Formulario.value.lote_id,
-          this.Formulario.value.modulo_id,
-          this.Formulario.value.tipo_muestra_id];
+          let data = [
+            this.Formulario.value.hacienda_id,
+            this.Formulario.value.lote_id,
+            this.Formulario.value.modulo_id,
+            this.Formulario.value.tipo_muestra_id,
+            localStorage.getItem('id_usuario'),
+            this.MyUser.dateNow()
+          ];
 
           this.dbQuery.openOrCreateDB().then(db => {
-            this.dbQuery.insertar(db, 'INSERT INTO rk_hc_form_cab (hacienda_id,lote,modulo,tipo_muestra_id) VALUES (?,?,?,?)', data)
+            this.dbQuery.insertar(db, 'INSERT INTO rk_hc_form_cab (hacienda_id,lote,modulo,tipo_muestra_id,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?)', data)
               .then(() => {
                 if (this.dbQuery.respuesta.estado === 'ok') {
                   this.Formulario.reset({
-                    responsable_id:localStorage.getItem('id_usuario')
+                    responsable_id: localStorage.getItem('id_usuario')
                   });
                   this.msg.msgOk();
+                  this.consultarTabla();
                 } else {
                   this.msg.msgError('No se pudo agregar formulario a la Base de Datos.');
                 }
@@ -132,24 +143,5 @@ export class FormInicioComponent implements OnInit {
       }
     });
 
-
-
-
-
-
-    /*this.db.insertarNuevoFormulario(
-      this.mainForm.value.hacienda_id,
-      this.mainForm.value.lote,
-      this.mainForm.value.modulo,
-      this.mainForm.value.tipo_muestra_id
-      ).then((res) => {
-        this.mainForm.reset();
-        if(this.db.respuesta.estado === 'ok'){
-          this.msg.msgOk();
-        }else{
-          this.msg.msgError('No se pudo agregar formulario a la Base de Datos.');
-        }
-        this.db.respuesta = {};
-      });*/
   }
 }

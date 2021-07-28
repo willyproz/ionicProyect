@@ -55,34 +55,7 @@
   </div>
   <ion-grid>
     <div class="fma" id="ma0">
-      <app-form-inicio></app-form-inicio>
-
-      <div class="panel panel-default">
-        <!-- Default panel contents -->
-        <div class="panel-heading text-center"><b>FORMULARIOS {{ titulo | uppercase}}</b></div>
-        <div class="panel-body"></div>
-        <!-- Table -->
-        <table class="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>HACIENDA</th>
-              <th>MUESTRA</th>
-              <th>LOTE</th>
-              <th>MODULO</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let data of Data">
-              <td>{{data.id}}</td>
-              <td>{{data.hacienda_id}}</td>
-              <td>{{data.muestra_id}}</td>
-              <td>L{{data.lote}}</td>
-              <td>M{{data.modulo}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <app-form-inicio [tituloTabla]='titulo | uppercase'></app-form-inicio>
     </div>
 
     <div *ngFor="let item of FormStruct; let i=index">

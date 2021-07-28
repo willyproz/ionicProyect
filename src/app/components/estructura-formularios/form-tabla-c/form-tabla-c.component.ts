@@ -1,4 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { DbQuery } from 'src/app/services/model/dbQuerys.service';
+import { MyUserService } from 'src/app/services/utilitarios/myUser.service';
 
 @Component({
   selector: 'app-form-tabla-c',
@@ -6,7 +9,6 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./form-tabla-c.component.scss'],
 })
 export class FormTablaCComponent implements OnInit {
-
 
   public titulo: string = '';
   public tipo: string = '';
@@ -22,6 +24,7 @@ export class FormTablaCComponent implements OnInit {
     this.maxNotas = Object.assign([], []);
 
     this.titulo = _data.nombre;
+    this.tipo = _data.tipo;
 
     for (let i = 0; i < _data.n_cuadrante; i++) {
       this.headCuadranteTable.push('C' + (i + 1));
@@ -35,15 +38,48 @@ export class FormTablaCComponent implements OnInit {
     for (let i = _data.nota_min; i <= _data.nota_max; i++) {
       this.maxNotas.push((i));
     }
-
   }
 
-  constructor() {
-
-  }
+  TablaFormularioDet: any[] = [];
+  constructor(public formBuilder: FormBuilder, private dbQuery: DbQuery, private MyUser: MyUserService) { }
 
   ngOnInit() {
-
+    this.consultarTabla();
   }
 
+  consultarTabla() {
+    this.dbQuery.openOrCreateDB().then(db => {
+      let sql = 'SELECT * FROM rk_hc_form_det WHERE estado = ?';
+      this.dbQuery.consultaAll(db, sql, 'A')
+        .then(item => {
+          this.TablaFormularioDet = item;
+        });
+    });
+  }
+
+  async insertarFormulario(formulario: NgForm) {
+    console.log(formulario.value);
+
+    const array1 = Object.values(formulario.value.elemento[0]);
+    await array1.forEach(async (element: string, index, array) => {
+      if (element.length !== 0) {
+        let resultado = element.split('_');
+        let data = [
+          resultado[0],
+          'C' + resultado[1],
+          resultado[2],
+          formulario.value.tipo_pag,
+          formulario.value.tipo_ubicacion,
+          localStorage.getItem('id_usuario'),
+          this.MyUser.dateNow()
+        ];
+        await this.dbQuery.openOrCreateDB().then(db => {
+          let sql = 'INSERT INTO rk_hc_form_det (linea,nombre,valor,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?)';
+          this.dbQuery.insertar(db, sql, data).then(console.log);
+        });
+      }
+    });
+    this.consultarTabla();
+
+  }
 }

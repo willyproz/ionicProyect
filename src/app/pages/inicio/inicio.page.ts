@@ -51,8 +51,7 @@ export class InicioPage implements OnInit {
   }
 
   logout(){
-    localStorage.clear();//('token');
+    localStorage.clear();
     this.router.navigate(['/login'])
-    //this.router.navigateByUrl('/login');
   }
 }

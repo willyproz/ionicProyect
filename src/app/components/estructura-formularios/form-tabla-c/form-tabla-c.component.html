@@ -1,11 +1,12 @@
+<form  (ngSubmit)="insertarFormulario(Formulario)" #Formulario="ngForm">
 <div class="panel panel-primary">
   <div class="panel-heading p5">
     <h6 class="text-center no-margin">{{titulo}}</h6>
   </div>
   <div class="panel-body p5">
-    <form id="form-cuadrante-<?= $tipo ?>" method="POST" action="#">
-      <input type="hidden" name="tipo_pag" value="<{{tipo}}">
-      <input type="hidden" name="tipo_ubicacion" value="C">
+
+      <input type="hidden" class="form-control" [(ngModel)] = "tipo" name="tipo_pag">
+      <input type="hidden" class="form-control" ngModel = "C" name="tipo_ubicacion">
       <div>
         <div class="pre-scrollable">
           <table class="table table-striped table-bordered table-hover no-padding sticky_header">
@@ -27,8 +28,8 @@
                 </td>
                 <td *ngFor="let itemNcuadrantes of maxCuadrantes;let inc = index">
                   <p class="text-center p5 no-margin ">
-                    <ion-select placeholder="-----">
-                      <ion-select-option *ngFor="let itemNotas of maxNotas;let inc = index" value="{{itemNotas}}">
+                    <ion-select placeholder="-----" class="form-control" ngModel name="elemento[0][L{{(iml+1)+'-C'+(inc+1)}}]">
+                      <ion-select-option *ngFor="let itemNotas of maxNotas" value="{{(iml+1)+'_'+(inc+1)+'_'+itemNotas}}">
                         {{itemNotas}}</ion-select-option>
                     </ion-select>
                   </p>
@@ -38,7 +39,6 @@
           </table>
         </div>
       </div>
-    </form>
   </div>
 </div>
 <div class="col-xs-12 text-center">
@@ -46,4 +46,39 @@
     <ion-icon name="checkmark-outline"></ion-icon>
     Grabar
   </ion-button>
+</div>
+</form>
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading text-center"><b>BASE DE DATOS</b></div>
+  <div class="panel-body"></div>
+  <!-- Table -->
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>FORMULARIO_ID</th>
+        <th>LINEA</th>
+        <th>CUADRANTE</th>
+        <th>VALOR_C</th>
+        <th>TIPO_PAG</th>
+        <th>TIPO_UBICACION</th>
+        <th>USUARIO CRE</th>
+        <th>FECHA CRE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of TablaFormularioDet">
+        <td>{{data.id}}</td>
+        <td>{{data.formulario_id}}</td>
+        <td>{{data.linea}}</td>
+        <td>{{data.nombre}}</td>
+        <td>{{data.valor}}</td>
+        <td>{{data.tipo_pag}}</td>
+        <td>{{data.tipo_ubicacion}}</td>
+        <td>{{data.usuario_cre_id}}</td>
+        <td>{{data.fecha_cre}}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
