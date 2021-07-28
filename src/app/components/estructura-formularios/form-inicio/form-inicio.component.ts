@@ -24,6 +24,13 @@ export class FormInicioComponent implements OnInit {
         descripcion: localStorage.getItem('nombre'),
       }
     ]
+
+    this.dbQuery.validarLogin().subscribe(console.log);
+  }
+  
+  
+  ionViewWillEnter() {
+    this.dbQuery.validarLogin().subscribe(console.log);
   }
 
   SelectHacienda: any[] = [];
@@ -86,6 +93,8 @@ export class FormInicioComponent implements OnInit {
     tipo_muestra_id: ['', [Validators.required, Validators.minLength(6), Validators.pattern('[0-9]')]]
   });
 
+  
+
 
 
   insertarFormulario() {
@@ -93,6 +102,7 @@ export class FormInicioComponent implements OnInit {
     console.log(this.Formulario.valid);
 
     this.msg.msgConfirmar().then((result) => {
+     
       if (result.isConfirmed) {
         if (this.Formulario.valid === true) {
           let data = [this.Formulario.value.hacienda_id,
@@ -103,11 +113,11 @@ export class FormInicioComponent implements OnInit {
           this.dbQuery.openOrCreateDB().then(db => {
             this.dbQuery.insertar(db, 'INSERT INTO rk_hc_form_cab (hacienda_id,lote,modulo,tipo_muestra_id) VALUES (?,?,?,?)', data)
               .then(() => {
-                this.Formulario.reset();
                 if (this.dbQuery.respuesta.estado === 'ok') {
+                  this.Formulario.reset({
+                    responsable_id:localStorage.getItem('id_usuario')
+                  });
                   this.msg.msgOk();
-                  this.SelectUsuario = [{codigo: localStorage.getItem('id_usuario'),descripcion: localStorage.getItem('nombre')}];
-                  console.log(this.SelectUsuario);
                 } else {
                   this.msg.msgError('No se pudo agregar formulario a la Base de Datos.');
                 }

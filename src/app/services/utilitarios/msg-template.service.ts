@@ -40,8 +40,8 @@ export class MsgTemplateService {
     }
   })*/
 
-  async msgConfirmar(msg: string = '¿Quieres guardar el formulario?') {
-    let msgConfirmed = await Swal.fire({
+  msgConfirmar(msg: string = '¿Quieres guardar el formulario?') {
+    let msgConfirmed = Swal.fire({
       title: msg,
       showDenyButton: true,
       showCancelButton: true,

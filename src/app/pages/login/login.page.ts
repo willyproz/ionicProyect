@@ -54,8 +54,8 @@ export class LoginPage implements OnInit {
            await localStorage.setItem('user',email);
            await localStorage.setItem('nombre',res[0].nombre);
            await localStorage.setItem('id_usuario',res[0].id);
-            this.router.navigateByUrl('/inicio');
-            this.msg.msgOk('Inicio de sesión exitoso.');
+           this.router.navigate(['/inicio'])
+           this.msg.msgOk('Inicio de sesión exitoso.');
           }else{
             this.msg.msgError('Usuario o Contraseña incorrectos.');
           }

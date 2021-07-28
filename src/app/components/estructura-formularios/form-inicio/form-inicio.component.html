@@ -4,7 +4,7 @@
     <ion-item>
       <ion-label>Responsable</ion-label>
       <ion-select [disabled]="true" [(ngModel)]="SelectUsuario[0].codigo"  formControlName="responsable_id" interface="action-sheet">
-        <ion-select-option selectedText *ngFor="let value of SelectUsuario" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
+        <ion-select-option selectedText value="{{ SelectUsuario[0].codigo }}">{{ SelectUsuario[0].descripcion }}</ion-select-option>
       </ion-select>
     </ion-item>
   </ion-col>

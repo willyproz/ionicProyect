@@ -4,7 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
 import {Md5} from 'ts-md5/dist/md5';
-import { Observable } from 'rxjs';
+import {from as fromPromise,Observable } from 'rxjs';
+import { map,tap } from 'rxjs/operators';
 
 
 @Injectable({
@@ -73,24 +74,29 @@ export class DbQuery {
     });
   }
 
-  async  validarLogin(){
+  async  validarPromise(){
     let email = localStorage.getItem('user');
     let  db = await this.openOrCreateDB();
     let sql = 'SELECT clave FROM rk_hc_usuario WHERE correo = "'+email+'"'
-     return await  this.consultaLogin(db,sql)
-        .then((res)=>{
-          let respuesta:boolean;
-          let localToken = localStorage.getItem('token');
-          let emailCodec = Md5.hashStr(email);
-          let verificarToken = emailCodec+res[0].clave;
-          console.log(localToken);
-          console.log(verificarToken);
-          if(localToken === verificarToken){
-            respuesta = true;
-          }else{
-            respuesta =  false;
-          }
-          return respuesta;
-        });
+     return await new Promise((resolve)=>{
+      this.consultaLogin(db,sql)
+      .then((res)=>{
+        let localToken = localStorage.getItem('token');
+        let emailCodec = Md5.hashStr(email);
+        let verificarToken = emailCodec+res[0].clave;
+        if(localToken === verificarToken){
+          resolve(true);
+        }else{
+          resolve(false);
+        }
+      });
+     }); 
+       
      }
+
+  validarLogin():Observable<any>{
+    console.log('validando');
+    return fromPromise(this.validarPromise());
+  }
+
 }
