@@ -1,60 +1,84 @@
 <form [formGroup]="Formulario" (ngSubmit)="insertarFormulario()">
-<ion-row>
-  <ion-col class="ion-align-self-start">
-    <ion-item>
-      <ion-label>Responsable</ion-label>
-      <ion-select [disabled]="true" [(ngModel)]="SelectUsuario[0].codigo"  formControlName="responsable_id" interface="action-sheet">
-        <ion-select-option selectedText value="{{ SelectUsuario[0].codigo }}">{{ SelectUsuario[0].descripcion }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-  </ion-col>
-  <ion-col class="ion-align-self-end">
-    <ion-item>
-      <ion-label>Hacienda</ion-label>
-      <ion-select formControlName="hacienda_id" placeholder="Seleccionar hacienda" interface="action-sheet">
-        <ion-select-option *ngFor="let value of SelectHacienda" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-  </ion-col>
-</ion-row>
-<ion-row>
-  <ion-col class="ion-align-self-start">
-    <ion-item>
-      <ion-label>Lote</ion-label>
-      <ion-select formControlName="lote_id" placeholder="Seleccionar lote" interface="action-sheet">
-        <ion-select-option *ngFor="let value of SelectLote" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-  </ion-col>
-  <ion-col class="ion-align-self-center">
-    <ion-item>
-      <ion-label>Modulo</ion-label>
-      <ion-select formControlName="modulo_id" placeholder="Seleccionar modulo" interface="action-sheet">
-        <ion-select-option *ngFor="let value of SelectModulo" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-  </ion-col>
-  <ion-col class="ion-align-self-end">
-    <ion-item>
-      <ion-label>Tipo de muestra</ion-label>
-      <ion-select formControlName="tipo_muestra_id" placeholder="Seleccionar muestra" interface="action-sheet">
-        <ion-select-option *ngFor="let value of SelectTipoMuestra" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-  </ion-col>
-</ion-row>
-<ion-row>
-  <ion-col>
-    <ion-button type="submit" size="large" color="tertiary" expand="block">
-      <ion-icon name="checkmark-outline"></ion-icon>
+  <ion-row>
+    <ion-col class="ion-align-self-start">
+      <ion-item>
+        <ion-label>Responsable</ion-label>
+        <ion-select [disabled]="true" [(ngModel)]="SelectUsuario[0].codigo" formControlName="responsable_id"
+          interface="action-sheet">
+          <ion-select-option selectedText value="{{ SelectUsuario[0].codigo }}">{{ SelectUsuario[0].descripcion }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-col>
+    <ion-col class="ion-align-self-end">
+      <ion-item>
+        <ion-label>Hacienda</ion-label>
+        <ion-select *ngIf="FormularioCab.length > 0 ; else haciendatag" ngModel="{{FormularioCab[0].hacienda_id}}"
+          formControlName="hacienda_id">
+          <ion-select-option *ngFor="let value of SelectHacienda" value="{{ value.codigo }}">{{ value.descripcion }}
+          </ion-select-option>
+        </ion-select>
+        <ng-template #haciendatag>
+          <ion-select formControlName="hacienda_id" placeholder="Seleccionar Hacienda">
+            <ion-select-option *ngFor="let value of SelectHacienda" value="{{ value.codigo }}">{{ value.descripcion }}
+            </ion-select-option>
+          </ion-select>
+        </ng-template>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col class="ion-align-self-start">
+      <ion-item>
+        <ion-label>Lote</ion-label>
+        <ion-select [disabled]=true *ngIf="FormularioCab.length > 0 ; else lotetag" ngModel="{{FormularioCab[0].lote}}"
+          formControlName="lote_id" placeholder="Seleccionar lote" interface="action-sheet">
+          <ion-select-option *ngFor="let value of SelectLote" value="{{ value.codigo }}">{{ value.descripcion }}
+          </ion-select-option>
+        </ion-select>
+        <ng-template #lotetag>
+          <ion-select formControlName="lote_id" placeholder="Seleccionar lote" interface="action-sheet">
+            <ion-select-option *ngFor="let value of SelectLote" value="{{ value.codigo }}">{{ value.descripcion }}
+            </ion-select-option>
+          </ion-select>
+        </ng-template>
+      </ion-item>
+    </ion-col>
+    <ion-col class="ion-align-self-center">
+      <ion-item>
+        <ion-label>Modulo</ion-label>
+        <ion-select [disabled]=true *ngIf="FormularioCab.length > 0 ; else lotetag" ngModel="{{FormularioCab[0].lote}}" formControlName="modulo_id" interface="action-sheet">
+          <ion-select-option *ngFor="let value of SelectModulo" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
+        </ion-select>
+        <ng-template #lotetag>
+          <ion-select formControlName="modulo_id" placeholder="Seleccionar modulo" interface="action-sheet">
+            <ion-select-option *ngFor="let value of SelectModulo" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
+          </ion-select>
+        </ng-template>
+      </ion-item>
+    </ion-col>
+    <ion-col class="ion-align-self-end">
+      <ion-item>
+        <ion-label>Tipo de muestra</ion-label>
+        <ion-select formControlName="tipo_muestra_id" placeholder="Seleccionar muestra" interface="action-sheet">
+          <ion-select-option *ngFor="let value of SelectTipoMuestra" value="{{ value.codigo }}">{{ value.descripcion }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <ion-button type="submit" size="large" color="tertiary" expand="block">
+        <ion-icon name="checkmark-outline"></ion-icon>
         Grabar
-    </ion-button>
-    <ion-button type="button" disabled="true" size="large" color="dark" expand="block">
-      <ion-icon name="warning-outline"></ion-icon>
+      </ion-button>
+      <ion-button type="button" disabled="true" size="large" color="dark" expand="block">
+        <ion-icon name="warning-outline"></ion-icon>
         Liquidar
       </ion-button>
     </ion-col>
-</ion-row>
+  </ion-row>
 </form>
 <div class="panel panel-default">
   <!-- Default panel contents -->

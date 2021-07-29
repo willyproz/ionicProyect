@@ -46,7 +46,7 @@ export class MsgTemplateService {
       showDenyButton: true,
       showCancelButton: true,
       confirmButtonText: `Si`,
-      denyButtonText: `No`,
+      denyButtonText: `No`
     });
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");
@@ -56,15 +56,15 @@ export class MsgTemplateService {
   async toastMsg(msg: any = '', icon: any = 'success', position: any = 'top-end') {
 
     let color = '';
-    if (icon === 'success') {
+    if (icon == 'success') {
       color = '#a5dc86';
-    } else if (icon === 'error') {
+    } else if (icon == 'error') {
       color = '#f27474';
-    } else if (icon === 'warning') {
+    } else if (icon == 'warning') {
       color = '#f8bb86';
-    } else if (icon === 'info') {
+    } else if (icon == 'info') {
       color = '#3fc3ee';
-    } else if (icon === 'question') {
+    } else if (icon == 'question') {
       color = '#87adbd';
     }
 
@@ -80,9 +80,23 @@ export class MsgTemplateService {
 
     await Toast.fire({
       icon: icon,
-      title: msg
+      html: '<span style="color: white; font-size:14px"><b>'+msg+'</b></span>'
     })
   }
+
+
+  async MsgAutoClose(msg: any = '', icon: any = 'success', position: any = 'top-end') {
+   await Swal.fire({
+      position: position,
+      icon: icon,
+      title: msg,
+      showConfirmButton: false,
+      timer: 1500
+    })
+    var el = document.querySelector('body')!;
+    el.classList.remove("swal2-height-auto");
+  }
+
 
   async loadingCreate(msg: string) {
     let loading = await this.loadingCtrl.create({

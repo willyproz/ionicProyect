@@ -12,7 +12,7 @@ import { MyUserService } from '../../../services/utilitarios/myUser.service';
 
 export class FormInicioComponent implements OnInit {
 
-  tipo_formulario:any = '';
+  tipo_formulario: any = '';
 
   @Input() tituloTabla: string = '';
   @Input() set tipo_form(_data: any) {
@@ -37,7 +37,7 @@ export class FormInicioComponent implements OnInit {
 
 
   ionViewWillEnter() {
-  //  this.consultarTabla();
+    //  this.consultarTabla();
   }
 
   SelectHacienda: any[] = [];
@@ -46,9 +46,12 @@ export class FormInicioComponent implements OnInit {
   SelectModulo: any[] = [];
   SelectTipoMuestra: any[] = [];
   TablaFormularioCab: any[] = [];
+  FormularioCab: any[] = [{
+    hacienda_id:0
+  }];
 
   ngOnInit() {
-   // this.consultarTabla();
+    // this.consultarTabla();
     this.Formulario = this.formBuilder.group({
       responsable_id: [''],
       hacienda_id: [''],
@@ -99,6 +102,15 @@ export class FormInicioComponent implements OnInit {
           this.TablaFormularioCab = item;
         });
     });
+
+    this.dbQuery.openOrCreateDB().then(db => {
+      let sql = `SELECT * FROM rk_hc_form_cab WHERE tipo_form = '${this.tipo_formulario}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ?`;
+      this.dbQuery.consultaAll(db, sql, 'A')
+        .then(item => {
+          this.FormularioCab = item;
+          console.log(item);
+        });
+    });
   }
 
   Formulario: FormGroup = this.formBuilder.group({
@@ -111,42 +123,58 @@ export class FormInicioComponent implements OnInit {
 
 
   insertarFormulario() {
-    this.msg.msgConfirmar().then((result) => {
 
-      if (result.isConfirmed) {
-        if (this.Formulario.valid === true) {
-          let data = [
-            this.tipo_formulario,
-            this.Formulario.value.hacienda_id,
-            this.Formulario.value.lote_id,
-            this.Formulario.value.modulo_id,
-            this.Formulario.value.tipo_muestra_id,
-            localStorage.getItem('id_usuario'),
-            this.MyUser.dateNow()
-          ];
+    this.dbQuery.openOrCreateDB().then(db => {
+      let sql = `SELECT count(*) as cnt FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_formulario}' and estado = ? `;
+      this.dbQuery.consultaAll(db, sql, 'A')
+        .then(resp => {
+          console.log(resp);
+          if (resp[0].cnt < 1) {
 
-          this.dbQuery.openOrCreateDB().then(db => {
-            this.dbQuery.insertar(db, 'INSERT INTO rk_hc_form_cab (tipo_form,hacienda_id,lote,modulo,tipo_muestra_id,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?)', data)
-              .then(() => {
-                if (this.dbQuery.respuesta.estado === 'ok') {
-                  this.Formulario.reset({
-                    responsable_id: localStorage.getItem('id_usuario')
+            this.msg.msgConfirmar().then((result) => {
+              if (result.isConfirmed) {
+                if (this.Formulario.valid === true) {
+                  let data = [
+                    this.tipo_formulario,
+                    this.Formulario.value.hacienda_id,
+                    this.Formulario.value.lote_id,
+                    this.Formulario.value.modulo_id,
+                    this.Formulario.value.tipo_muestra_id,
+                    localStorage.getItem('id_usuario'),
+                    this.MyUser.dateNow()
+                  ];
+                  this.dbQuery.openOrCreateDB().then(db => {
+                    this.dbQuery.insertar(db, 'INSERT INTO rk_hc_form_cab (tipo_form,hacienda_id,lote,modulo,tipo_muestra_id,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?)', data)
+                      .then(() => {
+                        if (this.dbQuery.respuesta.estado === 'ok') {
+                          this.Formulario.reset({
+                            responsable_id: localStorage.getItem('id_usuario')
+                          });
+                          this.msg.toastMsg('Grabado con exito', 'success');
+                          this.consultarTabla();
+                        } else {
+                          this.msg.msgError('No se pudo agregar formulario a la Base de Datos.');
+                        }
+                        this.dbQuery.respuesta = {};
+                      });
                   });
-                  this.msg.msgOk();
-                  this.consultarTabla();
                 } else {
-                  this.msg.msgError('No se pudo agregar formulario a la Base de Datos.');
+                  this.msg.msgError('Favor verificar que los campos del formulario no esten vacios');
                 }
-                this.dbQuery.respuesta = {};
-              });
-          });
-        } else {
-          this.msg.msgError('Favor verificar que los campos del formulario no esten vacios');
-        }
-      } else if (result.isDenied) {
-        this.msg.msgInfo('Formulario no guardado');
-      }
+              } else if (result.isDenied) {
+                //  this.msg.msgInfo('Formulario no guardado');
+                this.msg.toastMsg('Formulario no guardado.', 'info');
+              }
+            });
+          } else {
+            this.msg.toastMsg('No puede crear un nuevo formulario mientras su usuario tenga un formulario activo. !!!', 'error');
+          }
+
+        });
     });
+
+
+
 
   }
 }

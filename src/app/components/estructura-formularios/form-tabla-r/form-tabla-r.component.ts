@@ -28,6 +28,8 @@ export class FormTablaRComponent implements OnInit {
     this.maxNotas = Object.assign([], []);
 
     this.titulo = _data.nombre;
+    this.tipo = _data.tipo;
+    this.tipo_form = _data.sigla;
 
     for (let i = 0; i < _data.n_cuadrante; i++) {
       this.headCuadranteTable.push('C' + (i + 1));
@@ -51,7 +53,9 @@ export class FormTablaRComponent implements OnInit {
   TablaFormularioDet: any[] = [];
   constructor(public formBuilder: FormBuilder, private dbQuery: DbQuery, private MyUser: MyUserService) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.consultarTabla();
+  }
 
 
   consultarTabla() {
@@ -65,6 +69,7 @@ export class FormTablaRComponent implements OnInit {
   }
 
   async insertarFormulario(formulario: NgForm) {
+    console.log(formulario.value);
     await Object.entries(formulario.value).forEach(async ([key, element]: any) => {
       let keyValid = key.indexOf('L');
       console.log(keyValid);
@@ -73,25 +78,26 @@ export class FormTablaRComponent implements OnInit {
         await this.dbQuery.openOrCreateDB().then(db => {
           let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_form}' and estado = ? ORDER BY id DESC LIMIT 1`;
           this.dbQuery.consultaAll(db, sql, 'A').then(result => {
-            console.log('id:' + result[0].id);
-            let sql1 = `SELECT count(*) as cnt, id FROM rk_hc_form_det WHERE formulario_id = ${result[0].id} and linea = ${resultado[0]} and nombre = '${'C' + resultado[1]}' and tipo_pag = '${formulario.value.tipo_pag}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ? `;
+            //console.log('id:' + result[0].id);
+            let sql1 = `SELECT count(*) as cnt, id FROM rk_hc_form_det WHERE formulario_id = ${result[0].id} and linea = ${resultado[0]} and nombre = '${'C' + resultado[1]}' and nombre2 = '${'R' + resultado[2]}' and tipo_pag = '${formulario.value.tipo_pag}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ? `;
             this.dbQuery.consultaAll(db, sql1, 'A')
               .then(resp => {
                 console.log(resp);
                 let data = [
-                  result[0].id,
-                  resultado[0],
-                  'C' + resultado[1],
-                  resultado[2],
-                  formulario.value.tipo_pag,
-                  formulario.value.tipo_ubicacion,
-                  localStorage.getItem('id_usuario'),
-                  this.MyUser.dateNow()
+                  result[0].id,                         //id formulario
+                  resultado[0],                         //linea
+                  'C' + resultado[1],                   //cuadrante
+                  'R' + resultado[2],                   //rama
+                  resultado[3],                         //valor rama
+                  formulario.value.tipo_pag,            //tipo_pag
+                  formulario.value.tipo_ubicacion,      //tipo_ubicacion
+                  localStorage.getItem('id_usuario'),   //usuario_id
+                  this.MyUser.dateNow()                 //fecha_cre
                 ];
                 if (resp[0].cnt > 0) {
-                  db.executeSql(`UPDATE rk_hc_form_det SET formulario_id = ?, linea = ?,nombre=?,valor=?,tipo_pag=?,tipo_ubicacion=?,usuario_cre_id=?,fecha_cre=? WHERE id = ${resp[0].id}`, data)
+                  db.executeSql(`UPDATE rk_hc_form_det SET formulario_id = ?, linea = ?,nombre=?,nombre2=?,valor2=?,tipo_pag=?,tipo_ubicacion=?,usuario_cre_id=?,fecha_cre=? WHERE id = ${resp[0].id}`, data)
                 } else {
-                  let sql = 'INSERT INTO rk_hc_form_det (formulario_id,linea,nombre,valor,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?,?)';
+                  let sql = 'INSERT INTO rk_hc_form_det (formulario_id,linea,nombre,nombre2,valor2,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?,?,?)';
                   this.dbQuery.insertar(db, sql, data);
                 }
                 this.consultarTabla();
