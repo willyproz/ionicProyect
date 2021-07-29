@@ -178,7 +178,7 @@ export class Sync {
             'origin': 'http://localhost:8000',
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,DELETE,PUT'
+            'Access-Control-Allow-Methods': 'POST'
           }
         )
     })

@@ -65,6 +65,7 @@
     <thead>
       <tr>
         <th>ID</th>
+        <th>TIPO FORM</th>
         <th>HACIENDA</th>
         <th>MUESTRA</th>
         <th>LOTE</th>
@@ -77,6 +78,7 @@
     <tbody>
       <tr *ngFor="let data of TablaFormularioCab">
         <td>{{data.id}}</td>
+        <td>{{data.tipo_form}}</td>
         <td>{{data.hacienda}}</td>
         <td>{{data.tipo_muestra}}</td>
         <td>L{{data.lote}}</td>

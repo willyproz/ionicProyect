@@ -12,7 +12,15 @@ import { MyUserService } from '../../../services/utilitarios/myUser.service';
 
 export class FormInicioComponent implements OnInit {
 
+  tipo_formulario:any = '';
+
   @Input() tituloTabla: string = '';
+  @Input() set tipo_form(_data: any) {
+    console.log(_data);
+    this.tipo_formulario = _data;
+    this.consultarTabla();
+  };
+
   constructor(
     public formBuilder: FormBuilder,
     private dbQuery: DbQuery,
@@ -29,6 +37,7 @@ export class FormInicioComponent implements OnInit {
 
 
   ionViewWillEnter() {
+  //  this.consultarTabla();
   }
 
   SelectHacienda: any[] = [];
@@ -39,7 +48,7 @@ export class FormInicioComponent implements OnInit {
   TablaFormularioCab: any[] = [];
 
   ngOnInit() {
-
+   // this.consultarTabla();
     this.Formulario = this.formBuilder.group({
       responsable_id: [''],
       hacienda_id: [''],
@@ -48,7 +57,7 @@ export class FormInicioComponent implements OnInit {
       tipo_muestra_id: ['']
     });
 
-    this.consultarTabla();
+
 
     this.dbQuery.openOrCreateDB().then(db => {
       this.dbQuery.consultaAll(db, 'SELECT id as codigo, nombre as descripcion  FROM rk_hc_hacienda  WHERE estado = ?', 'A')
@@ -84,7 +93,7 @@ export class FormInicioComponent implements OnInit {
 
   consultarTabla() {
     this.dbQuery.openOrCreateDB().then(db => {
-      let sql = 'SELECT ca.id, rhh.nombre as hacienda, ca.lote,ca.modulo, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.estado = ?';
+      let sql = `SELECT ca.tipo_form, ca.id, rhh.nombre as hacienda, ca.lote,ca.modulo, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.tipo_form = '${this.tipo_formulario}' and ca.estado = ?`;
       this.dbQuery.consultaAll(db, sql, 'A')
         .then(item => {
           this.TablaFormularioCab = item;
@@ -101,17 +110,13 @@ export class FormInicioComponent implements OnInit {
   });
 
 
-
-
-
   insertarFormulario() {
-    console.log(this.Formulario.value);
-    console.log(this.Formulario.valid);
     this.msg.msgConfirmar().then((result) => {
 
       if (result.isConfirmed) {
         if (this.Formulario.valid === true) {
           let data = [
+            this.tipo_formulario,
             this.Formulario.value.hacienda_id,
             this.Formulario.value.lote_id,
             this.Formulario.value.modulo_id,
@@ -121,7 +126,7 @@ export class FormInicioComponent implements OnInit {
           ];
 
           this.dbQuery.openOrCreateDB().then(db => {
-            this.dbQuery.insertar(db, 'INSERT INTO rk_hc_form_cab (hacienda_id,lote,modulo,tipo_muestra_id,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?)', data)
+            this.dbQuery.insertar(db, 'INSERT INTO rk_hc_form_cab (tipo_form,hacienda_id,lote,modulo,tipo_muestra_id,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?)', data)
               .then(() => {
                 if (this.dbQuery.respuesta.estado === 'ok') {
                   this.Formulario.reset({

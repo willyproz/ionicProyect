@@ -55,7 +55,7 @@
   </div>
   <ion-grid>
     <div class="fma" id="ma0">
-      <app-form-inicio [tituloTabla]='titulo | uppercase'></app-form-inicio>
+      <app-form-inicio [tituloTabla]='titulo | uppercase' [tipo_form]='sigla' ></app-form-inicio>
     </div>
 
     <div *ngFor="let item of FormStruct; let i=index">

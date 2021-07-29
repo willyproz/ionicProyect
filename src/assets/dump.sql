@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS rk_hc_form_cab(
     observacion TEXT,
     estado CHAR(1) DEFAULT 'A',
     liquidado CHAR(1) DEFAULT 'N',
+    tipo_form VARCHAR(10),
     usuario_cre_id INTEGER,
     fecha_cre DATETIME,
     usuario_mod_id INTEGER,

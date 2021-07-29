@@ -53,6 +53,37 @@ export class MsgTemplateService {
     return msgConfirmed;
   }
 
+  async toastMsg(msg: any = '', icon: any = 'success', position: any = 'top-end') {
+
+    let color = '';
+    if (icon === 'success') {
+      color = '#a5dc86';
+    } else if (icon === 'error') {
+      color = '#f27474';
+    } else if (icon === 'warning') {
+      color = '#f8bb86';
+    } else if (icon === 'info') {
+      color = '#3fc3ee';
+    } else if (icon === 'question') {
+      color = '#87adbd';
+    }
+
+    const Toast = Swal.mixin({
+      toast: true,
+      background: color,
+      iconColor: 'white',
+      position: position,
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    })
+
+    await Toast.fire({
+      icon: icon,
+      title: msg
+    })
+  }
+
   async loadingCreate(msg: string) {
     let loading = await this.loadingCtrl.create({
       cssClass: 'my-custom-class',
