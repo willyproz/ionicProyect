@@ -59,27 +59,37 @@ export class FormTablaCComponent implements OnInit {
 
   async insertarFormulario(formulario: NgForm) {
     console.log(formulario.value);
-
-    const array1 = Object.values(formulario.value.elemento[0]);
-    await array1.forEach(async (element: string, index, array) => {
-      if (element.length !== 0) {
+   // const array1 = Object.values(formulario.value);
+    await Object.entries(formulario.value).forEach(async ([key, element]:any) => {
+      let keyValid = key.indexOf('L');
+      console.log(keyValid);
+      if (keyValid >= 0 && element.length !== 0) {
         let resultado = element.split('_');
-        let data = [
-          resultado[0],
-          'C' + resultado[1],
-          resultado[2],
-          formulario.value.tipo_pag,
-          formulario.value.tipo_ubicacion,
-          localStorage.getItem('id_usuario'),
-          this.MyUser.dateNow()
-        ];
         await this.dbQuery.openOrCreateDB().then(db => {
-          let sql = 'INSERT INTO rk_hc_form_det (linea,nombre,valor,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?)';
-          this.dbQuery.insertar(db, sql, data).then(console.log);
+          let sql1 = `SELECT TOP 1 count(*) as cnt, id FROM rk_hc_form_det WHERE linea = ${resultado[0]} and nombre = '${'C' + resultado[1]}' and tipo_pag = '${formulario.value.tipo_pag}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ? `;
+          this.dbQuery.consultaAll(db, sql1, 'A')
+            .then(resp => {
+              let data = [
+                resultado[0],
+                'C' + resultado[1],
+                resultado[2],
+                formulario.value.tipo_pag,
+                formulario.value.tipo_ubicacion,
+                localStorage.getItem('id_usuario'),
+                this.MyUser.dateNow()
+              ];
+              if(resp[0].cnt > 0){
+                console.log(resp);
+                db.executeSql(`UPDATE rk_hc_form_det SET linea = ?,nombre=?,valor=?,tipo_pag=?,tipo_ubicacion=?,usuario_cre_id=?,fecha_cre=? WHERE id = ${resp[0].id}`,data)
+              }else{
+                console.log(resp);
+                let sql = 'INSERT INTO rk_hc_form_det (linea,nombre,valor,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?,?)';
+                this.dbQuery.insertar(db, sql, data);
+              }
+              this.consultarTabla();
+            });
         });
       }
     });
-    this.consultarTabla();
-
   }
 }

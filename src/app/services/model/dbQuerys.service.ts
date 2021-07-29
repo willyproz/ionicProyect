@@ -95,7 +95,7 @@ export class DbQuery {
      }
 
   validarLogin():Observable<any>{
-    console.log('validando');
+  //  console.log('validando');
     return fromPromise(this.validarPromise());
   }
 

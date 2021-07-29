@@ -28,7 +28,7 @@
                 </td>
                 <td *ngFor="let itemNcuadrantes of maxCuadrantes;let inc = index">
                   <p class="text-center p5 no-margin ">
-                    <ion-select placeholder="-----" class="form-control" ngModel name="elemento[0][L{{(iml+1)+'-C'+(inc+1)}}]">
+                    <ion-select placeholder="-----" class="form-control" ngModel name="L{{(iml+1)+'-C'+(inc+1)}}">
                       <ion-select-option *ngFor="let itemNotas of maxNotas" value="{{(iml+1)+'_'+(inc+1)+'_'+itemNotas}}">
                         {{itemNotas}}</ion-select-option>
                     </ion-select>
@@ -40,12 +40,12 @@
         </div>
       </div>
   </div>
-</div>
-<div class="col-xs-12 text-center">
-  <ion-button type="submit" size="large" color="tertiary" expand="block">
-    <ion-icon name="checkmark-outline"></ion-icon>
-    Grabar
-  </ion-button>
+  <div class="col-xs-12 text-center">
+    <ion-button type="submit" size="large" color="tertiary" expand="block">
+      <ion-icon name="checkmark-outline"></ion-icon>
+      Grabar
+    </ion-button>
+  </div>
 </div>
 </form>
 <div class="panel panel-default">
@@ -59,10 +59,10 @@
         <th>ID</th>
         <th>FORMULARIO_ID</th>
         <th>LINEA</th>
-        <th>CUADRANTE</th>
-        <th>VALOR_C</th>
-        <th>TIPO_PAG</th>
-        <th>TIPO_UBICACION</th>
+        <th>COLUMNA</th>
+        <th>VALOR</th>
+        <th>PAGINA</th>
+        <th>TIPO</th>
         <th>USUARIO CRE</th>
         <th>FECHA CRE</th>
       </tr>
