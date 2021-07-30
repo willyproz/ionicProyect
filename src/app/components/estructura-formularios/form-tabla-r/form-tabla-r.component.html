@@ -3,6 +3,7 @@
     position: relative;
     max-height: 100%;
   }
+
   .header-fixed thead {
     position: sticky !important;
     top: 0;
@@ -10,14 +11,14 @@
   }
 </style>
 <form (ngSubmit)="insertarFormulario(Formulario)" #Formulario="ngForm">
-<div class="panel panel-primary">
-  <div class="panel-heading p5">
-    <h6 class="text-center no-margin">{{ titulo }}</h6>
-  </div>
-  <div class="panel-body p5">
+  <div class="panel panel-primary">
+    <div class="panel-heading p5">
+      <h6 class="text-center no-margin">{{ titulo }}</h6>
+    </div>
+    <div class="panel-body p5">
 
-      <input type="hidden" class="form-control" [(ngModel)] = "tipo" name="tipo_pag">
-      <input type="hidden" class="form-control" ngModel = "C" name="tipo_ubicacion">
+      <input type="hidden" class="form-control" [(ngModel)]="tipo" name="tipo_pag">
+      <input type="hidden" class="form-control" ngModel="C" name="tipo_ubicacion">
       <div>
         <div class="pre-scrollable">
           <table class="header-fixed table table-striped table-bordered no-padding">
@@ -45,12 +46,35 @@
                 </td>
                 <ng-container *ngFor="let itemHeadCuadrante of headCuadranteTable;let hc = index">
                   <td *ngFor="let itemHeadRama of headRamaTable;let hrt = index">
-                    <p class="text-center p5 no-margin ">
-                      <ion-select placeholder="-----" ngModel name="L{{(iml+1)+'-C'+(hc+1)+'-R'+(hrt+1)}}" interface="action-sheet">
-                        <ion-select-option *ngFor="let itemNotas of maxNotas;let inc = index" value="{{(iml+1)+'_'+(hc+1)+'_'+(hrt+1)+'_'+itemNotas}}">
+                    <p class="text-center p5 no-margin "
+                      *ngIf="TablaFormularioDet.length > 0 ; else tablaCuadrantePruebatag">
+                      <ion-select style="background: lightgreen;" placeholder="-----" class="form-control"
+                        *ngIf="(FormularioDet['L'+(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)] | keyvalue)?.length; else tablaCuadrantetag"
+                        ngModel="{{FormularioDet['L'+(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)].linea + '_' + FormularioDet['L'+(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)].nombre + '_' + FormularioDet['L'+(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)].nombre2 + '_' + FormularioDet['L'+(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)].valor2}}"
+                        name="L{{(iml+1)+'-C'+(hc+1)+'-R'+(hrt+1)}}" interface="action-sheet">
+                        <ion-select-option *ngFor="let itemNotas of maxNotas;let inc = index"
+                          value="{{(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)+'_'+itemNotas}}">
                           {{itemNotas}}</ion-select-option>
                       </ion-select>
+                      <ng-template #tablaCuadrantetag>
+                        <ion-select placeholder="-----" class="form-control" ngModel
+                          name="L{{(iml+1)+'-C'+(hc+1)+'-R'+(hrt+1)}}" interface="action-sheet">
+                          <ion-select-option *ngFor="let itemNotas of maxNotas;let inc = index"
+                            value="{{(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)+'_'+itemNotas}}">
+                            {{itemNotas}}</ion-select-option>
+                        </ion-select>
+                      </ng-template>
                     </p>
+                    <ng-template #tablaCuadrantePruebatag>
+                      <p class="text-center p5 no-margin ">
+                        <ion-select placeholder="-----" class="form-control" ngModel
+                          name="L{{(iml+1)+'-C'+(hc+1)+'-R'+(hrt+1)}}" interface="action-sheet">
+                          <ion-select-option *ngFor="let itemNotas of maxNotas;let inc = index"
+                            value="{{(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)+'_'+itemNotas}}">
+                            {{itemNotas}}</ion-select-option>
+                        </ion-select>
+                      </p>
+                    </ng-template>
                   </td>
                 </ng-container>
               </tr>
@@ -58,14 +82,14 @@
           </table>
         </div>
       </div>
+    </div>
   </div>
-</div>
-<div class="col-xs-12 text-center">
-  <ion-button type="submit" size="large" color="tertiary" expand="block">
-    <ion-icon name="checkmark-outline"></ion-icon>
-    Grabar
-  </ion-button>
-</div>
+  <div class="col-xs-12 text-center">
+    <ion-button type="submit" size="large" color="tertiary" expand="block">
+      <ion-icon name="checkmark-outline"></ion-icon>
+      Grabar
+    </ion-button>
+  </div>
 </form>
 <div class="panel panel-default">
   <!-- Default panel contents -->

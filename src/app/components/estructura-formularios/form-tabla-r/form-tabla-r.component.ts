@@ -51,6 +51,8 @@ export class FormTablaRComponent implements OnInit {
   }
 
   TablaFormularioDet: any[] = [];
+  FormularioDet: any[] = [];
+
   constructor(public formBuilder: FormBuilder, private dbQuery: DbQuery, private MyUser: MyUserService) { }
 
   ngOnInit() {
@@ -60,10 +62,17 @@ export class FormTablaRComponent implements OnInit {
 
   consultarTabla() {
     this.dbQuery.openOrCreateDB().then(db => {
-      let sql = `SELECT * FROM rk_hc_form_det WHERE tipo_pag = '${this.tipo}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ?`;
-      this.dbQuery.consultaAll(db, sql, 'A')
-        .then(item => {
+      //let sql = `SELECT * FROM rk_hc_form_det WHERE tipo_pag = '${this.tipo}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ?`;
+      let sql = `SELECT d.* FROM rk_hc_form_det d
+                 INNER JOIN rk_hc_form_cab rhfc on rhfc.id = d.formulario_id
+                 WHERE d.tipo_pag = '${this.tipo}' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?`;
+      this.dbQuery.consultaAll(db, sql, 'N')
+        .then(async item => {
           this.TablaFormularioDet = item;
+          await Object.entries(item).forEach(([key, element]: any) =>{
+            this.FormularioDet['L'+element.linea+'_'+element.nombre+'_'+element.nombre2] = element
+          })
+          console.log(this.FormularioDet);
         });
     });
   }
@@ -76,18 +85,18 @@ export class FormTablaRComponent implements OnInit {
       if (keyValid >= 0 && element.length !== 0) {
         let resultado = element.split('_');
         await this.dbQuery.openOrCreateDB().then(db => {
-          let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_form}' and estado = ? ORDER BY id DESC LIMIT 1`;
-          this.dbQuery.consultaAll(db, sql, 'A').then(result => {
+          let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_form}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
+          this.dbQuery.consultaAll(db, sql, 'N').then(result => {
             //console.log('id:' + result[0].id);
-            let sql1 = `SELECT count(*) as cnt, id FROM rk_hc_form_det WHERE formulario_id = ${result[0].id} and linea = ${resultado[0]} and nombre = '${'C' + resultado[1]}' and nombre2 = '${'R' + resultado[2]}' and tipo_pag = '${formulario.value.tipo_pag}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ? `;
+            let sql1 = `SELECT count(*) as cnt, id FROM rk_hc_form_det WHERE formulario_id = ${result[0].id} and linea = ${resultado[0]} and nombre = '${resultado[1]}' and nombre2 = '${resultado[2]}' and tipo_pag = '${formulario.value.tipo_pag}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ? `;
             this.dbQuery.consultaAll(db, sql1, 'A')
               .then(resp => {
                 console.log(resp);
                 let data = [
                   result[0].id,                         //id formulario
                   resultado[0],                         //linea
-                  'C' + resultado[1],                   //cuadrante
-                  'R' + resultado[2],                   //rama
+                  resultado[1],                   //cuadrante
+                  resultado[2],                   //rama
                   resultado[3],                         //valor rama
                   formulario.value.tipo_pag,            //tipo_pag
                   formulario.value.tipo_ubicacion,      //tipo_ubicacion

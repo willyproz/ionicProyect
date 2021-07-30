@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { MsgTemplateService } from '../../../services/utilitarios/msg-template.service';
 import { DbQuery } from '../../../services/model/dbQuerys.service';
 import { MyUserService } from '../../../services/utilitarios/myUser.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-form-inicio',
@@ -25,7 +26,8 @@ export class FormInicioComponent implements OnInit {
     public formBuilder: FormBuilder,
     private dbQuery: DbQuery,
     private msg: MsgTemplateService,
-    private MyUser: MyUserService
+    private MyUser: MyUserService,
+    private router: Router,
   ) {
     this.SelectUsuario = [
       {
@@ -47,7 +49,7 @@ export class FormInicioComponent implements OnInit {
   SelectTipoMuestra: any[] = [];
   TablaFormularioCab: any[] = [];
   FormularioCab: any[] = [{
-    hacienda_id:0
+    hacienda_id: 0
   }];
 
   ngOnInit() {
@@ -96,16 +98,16 @@ export class FormInicioComponent implements OnInit {
 
   consultarTabla() {
     this.dbQuery.openOrCreateDB().then(db => {
-      let sql = `SELECT ca.tipo_form, ca.id, rhh.nombre as hacienda, ca.lote,ca.modulo, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.tipo_form = '${this.tipo_formulario}' and ca.estado = ?`;
-      this.dbQuery.consultaAll(db, sql, 'A')
+      let sql = `SELECT ca.tipo_form, ca.id, rhh.nombre as hacienda, ca.lote,ca.modulo, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.tipo_form = '${this.tipo_formulario}' and ca.liquidado = ?`;
+      this.dbQuery.consultaAll(db, sql, 'N')
         .then(item => {
           this.TablaFormularioCab = item;
         });
     });
 
     this.dbQuery.openOrCreateDB().then(db => {
-      let sql = `SELECT * FROM rk_hc_form_cab WHERE tipo_form = '${this.tipo_formulario}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ?`;
-      this.dbQuery.consultaAll(db, sql, 'A')
+      let sql = `SELECT * FROM rk_hc_form_cab WHERE tipo_form = '${this.tipo_formulario}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and liquidado = ?`;
+      this.dbQuery.consultaAll(db, sql, 'N')
         .then(item => {
           this.FormularioCab = item;
           console.log(item);
@@ -125,8 +127,8 @@ export class FormInicioComponent implements OnInit {
   insertarFormulario() {
 
     this.dbQuery.openOrCreateDB().then(db => {
-      let sql = `SELECT count(*) as cnt FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_formulario}' and estado = ? `;
-      this.dbQuery.consultaAll(db, sql, 'A')
+      let sql = `SELECT count(*) as cnt FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_formulario}' and liquidado = ? `;
+      this.dbQuery.consultaAll(db, sql, 'N')
         .then(resp => {
           console.log(resp);
           if (resp[0].cnt < 1) {
@@ -167,14 +169,33 @@ export class FormInicioComponent implements OnInit {
               }
             });
           } else {
-            this.msg.toastMsg('No puede crear un nuevo formulario mientras su usuario tenga un formulario activo. !!!', 'error');
+            this.msg.toastMsg('No puede crear un nuevo formulario mientras su usuario tenga un formulario activo!', 'error');
           }
 
         });
     });
+  }
 
 
 
-
+  async liquidarFormulario() {
+    await this.dbQuery.openOrCreateDB().then(db => {
+      let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_formulario}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
+      this.dbQuery.consultaAll(db, sql, 'N').then(result => {
+        console.log(result);
+        let data = [
+          'S',
+          localStorage.getItem('id_usuario'),
+          this.MyUser.dateNow()
+        ];
+        db.executeSql(`UPDATE rk_hc_form_cab SET liquidado = ?,usuario_mod_id=?,fecha_mod=? WHERE id = ${result[0].id}`, data).then(() => {
+          this.msg.toastMsg('Liquidado con exito', 'success');
+          this.router.navigateByUrl('/action-sheet');
+        }).catch(err => {
+          this.msg.toastMsg(err, 'error');
+        })
+      });
+    });
   }
 }
+

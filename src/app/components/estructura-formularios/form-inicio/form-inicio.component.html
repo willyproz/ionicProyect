@@ -1,3 +1,5 @@
+
+
 <form [formGroup]="Formulario" (ngSubmit)="insertarFormulario()">
   <ion-row>
     <ion-col class="ion-align-self-start">
@@ -73,7 +75,7 @@
   </ion-row>
   <ion-row>
     <ion-col>
-      <ion-button *ngIf="FormularioCab.length > 0 ; else liquidartag" type="button" size="large" color="danger" expand="block">
+      <ion-button *ngIf="FormularioCab.length > 0 ; else liquidartag" (click)="liquidarFormulario()" type="button" size="large" color="danger" expand="block">
         <ion-icon name="warning-outline"></ion-icon>
         Liquidar
       </ion-button>

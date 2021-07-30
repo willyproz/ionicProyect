@@ -1,12 +1,19 @@
-<form  (ngSubmit)="insertarFormulario(Formulario)" #Formulario="ngForm">
-<div class="panel panel-primary">
-  <div class="panel-heading p5">
-    <h6 class="text-center no-margin">{{titulo}}</h6>
-  </div>
-  <div class="panel-body p5">
-
-      <input type="hidden" class="form-control" [(ngModel)] = "tipo" name="tipo_pag">
-      <input type="hidden" class="form-control" ngModel = "C" name="tipo_ubicacion">
+<!-- tabla de data -->
+<form *ngIf="modoCamaraBool === true; else tablaImagenestag" (ngSubmit)="insertarFormulario(Formulario)"
+  #Formulario="ngForm">
+  <div class="panel panel-primary">
+    <div class="panel-heading p5" style="position: relative;">
+      <div style="position: absolute;left: 87%;">
+        <ion-button (click)="modoCamara()" color="warning">
+          <ion-icon name="camera-reverse-sharp"></ion-icon>
+        </ion-button>
+      </div>
+      <h6 class="text-center no-margin">{{titulo}}</h6>
+      <div style="clear:both"></div>
+    </div>
+    <div class="panel-body p5">
+      <input type="hidden" class="form-control" [(ngModel)]="tipo" name="tipo_pag">
+      <input type="hidden" class="form-control" ngModel="C" name="tipo_ubicacion">
       <div>
         <div class="pre-scrollable">
           <table class="table table-striped table-bordered table-hover no-padding sticky_header">
@@ -27,22 +34,31 @@
                   <p class="text-center p5 no-margin">{{(iml + 1)}}</p>
                 </td>
                 <td *ngFor="let itemNcuadrantes of maxCuadrantes;let inc = index">
-                  <p class="text-center p5 no-margin " *ngIf="TablaFormularioDet.length > 0 ; else tablaCuadrantePruebatag">
-                    <ion-select style="background: lightgreen;" placeholder="-----" class="form-control" *ngIf="(FormularioDet['L'+(iml+1)+'_C'+(inc+1)] | keyvalue)?.length; else tablaCuadrantetag" ngModel="{{FormularioDet['L'+(iml+1)+'_C'+(inc+1)].linea + '_' + FormularioDet['L'+(iml+1)+'_C'+(inc+1)].nombre + '_' + FormularioDet['L'+(iml+1)+'_C'+(inc+1)].valor}}" name="L{{(iml+1)+'-C'+(inc+1)}}" interface="action-sheet">
-                      <ion-select-option *ngFor="let itemNotas of maxNotas" value="{{(iml+1)+'_C'+(inc+1)+'_'+itemNotas}}">
-                        {{'c'+itemNotas}}</ion-select-option>
+                  <p class="text-center p5 no-margin "
+                    *ngIf="TablaFormularioDet.length > 0 ; else tablaCuadrantePruebatag">
+                    <ion-select style="background: lightgreen;" placeholder="-----" class="form-control"
+                      *ngIf="(FormularioDet['L'+(iml+1)+'_C'+(inc+1)] | keyvalue)?.length; else tablaCuadrantetag"
+                      ngModel="{{FormularioDet['L'+(iml+1)+'_C'+(inc+1)].linea + '_' + FormularioDet['L'+(iml+1)+'_C'+(inc+1)].nombre + '_' + FormularioDet['L'+(iml+1)+'_C'+(inc+1)].valor}}"
+                      name="L{{(iml+1)+'-C'+(inc+1)}}" interface="action-sheet">
+                      <ion-select-option *ngFor="let itemNotas of maxNotas"
+                        value="{{(iml+1)+'_C'+(inc+1)+'_'+itemNotas}}">
+                        {{itemNotas}}</ion-select-option>
                     </ion-select>
                     <ng-template #tablaCuadrantetag>
-                      <ion-select placeholder="-----" class="form-control" ngModel name="L{{(iml+1)+'-C'+(inc+1)}}" interface="action-sheet">
-                        <ion-select-option *ngFor="let itemNotas of maxNotas" value="{{(iml+1)+'_C'+(inc+1)+'_'+itemNotas}}">
-                          {{'c'+itemNotas}}</ion-select-option>
+                      <ion-select placeholder="-----" class="form-control" ngModel name="L{{(iml+1)+'-C'+(inc+1)}}"
+                        interface="action-sheet">
+                        <ion-select-option *ngFor="let itemNotas of maxNotas"
+                          value="{{(iml+1)+'_C'+(inc+1)+'_'+itemNotas}}">
+                          {{itemNotas}}</ion-select-option>
                       </ion-select>
                     </ng-template>
                   </p>
                   <ng-template #tablaCuadrantePruebatag>
                     <p class="text-center p5 no-margin ">
-                      <ion-select placeholder="-----" class="form-control" ngModel name="L{{(iml+1)+'-C'+(inc+1)}}" interface="action-sheet">
-                        <ion-select-option *ngFor="let itemNotas of maxNotas" value="{{(iml+1)+'_C'+(inc+1)+'_'+itemNotas}}">
+                      <ion-select placeholder="-----" class="form-control" ngModel name="L{{(iml+1)+'-C'+(inc+1)}}"
+                        interface="action-sheet">
+                        <ion-select-option *ngFor="let itemNotas of maxNotas"
+                          value="{{(iml+1)+'_C'+(inc+1)+'_'+itemNotas}}">
                           {{itemNotas}}</ion-select-option>
                       </ion-select>
                     </p>
@@ -53,15 +69,66 @@
           </table>
         </div>
       </div>
+    </div>
+    <div class="col-xs-12 text-center">
+      <ion-button type="submit" size="large" color="tertiary" expand="block">
+        <ion-icon name="checkmark-outline"></ion-icon>
+        Grabar
+      </ion-button>
+    </div>
   </div>
-  <div class="col-xs-12 text-center">
-    <ion-button type="submit" size="large" color="tertiary" expand="block">
-      <ion-icon name="checkmark-outline"></ion-icon>
-      Grabar
-    </ion-button>
-  </div>
-</div>
 </form>
+
+<!--tabla de images-->
+<ng-template #tablaImagenestag>
+  <div class="panel panel-primary">
+    <div class="panel-heading p5" style="position: relative;">
+      <div style="position: absolute;left: 87%;">
+        <ion-button (click)="modoCamara()" color="warning">
+          <ion-icon name="camera-reverse-sharp"></ion-icon>
+        </ion-button>
+      </div>
+      <h6 class="text-center no-margin">{{titulo}}</h6>
+      <div style="clear:both"></div>
+    </div>
+    <div class="panel-body p5">
+      <input type="hidden" class="form-control" [(ngModel)]="tipo" name="tipo_pag">
+      <input type="hidden" class="form-control" ngModel="C" name="tipo_ubicacion">
+      <div>
+        <div class="pre-scrollable">
+          <table class="table table-striped table-bordered table-hover no-padding sticky_header">
+            <thead>
+              <tr class="i"
+                style="position: sticky; top: 0; z-index: 10; color: white; background: #0277bd; background-color: #0277bd;">
+                <th>
+                  <p class="text-center p5 no-margin">#</p>
+                </th>
+                <th *ngFor="let itemHeadCuadrante of headCuadranteTable;">
+                  <p class="text-center p5 no-margin">{{itemHeadCuadrante}}</p>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="InputCalidad">
+              <tr *ngFor="let itemLinea of maxLineas;let iml = index">
+                <td>
+                  <p class="text-center p5 no-margin">{{(iml + 1)}}</p>
+                </td>
+                <td *ngFor="let itemNcuadrantes of maxCuadrantes;let inc = index">
+                  <p class="text-center p5 no-margin ">
+                    <ion-button expand="full" color="warning">
+                      <ion-icon name="camera-sharp"></ion-icon>
+                    </ion-button>
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
 <div class="panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-heading text-center"><b>BASE DE DATOS</b></div>

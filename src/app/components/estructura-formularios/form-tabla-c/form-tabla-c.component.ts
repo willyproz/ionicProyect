@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { DbQuery } from 'src/app/services/model/dbQuerys.service';
 import { MyUserService } from 'src/app/services/utilitarios/myUser.service';
+import { Camera } from '@ionic-native/camera/ngx';
 
 @Component({
   selector: 'app-form-tabla-c',
@@ -43,8 +44,9 @@ export class FormTablaCComponent implements OnInit {
   }
 
   TablaFormularioDet: any[] = [];
+
   FormularioDet: any[] = [];
-  constructor(public formBuilder: FormBuilder, private dbQuery: DbQuery, private MyUser: MyUserService) { }
+  constructor(public formBuilder: FormBuilder, private dbQuery: DbQuery, private MyUser: MyUserService, private Camera:Camera) { }
 
   ngOnInit() {
     this.consultarTabla();
@@ -52,23 +54,18 @@ export class FormTablaCComponent implements OnInit {
 
   consultarTabla() {
     this.dbQuery.openOrCreateDB().then(db => {
-      let sql = `SELECT *  FROM rk_hc_form_det WHERE tipo_pag = '${this.tipo}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ?`;
-      this.dbQuery.consultaAll(db, sql, 'A')
+      //let sql = `SELECT *  FROM rk_hc_form_det WHERE tipo_pag = '${this.tipo}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ?`;
+      let sql = `SELECT d.* FROM rk_hc_form_det d
+                 INNER JOIN rk_hc_form_cab rhfc on rhfc.id = d.formulario_id
+                 WHERE d.tipo_pag = '${this.tipo}' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?`;
+      this.dbQuery.consultaAll(db, sql, 'N')
         .then(async item => {
           this.TablaFormularioDet = item;
-       //   console.log(item);
-         /* await Object.entries(item).forEach(([key, element]: any) =>{
-            console.log(key);
-            console.log(element);
-            this.TablaFormularioDet[element.linea+'_'+element.nombre][key] = element
-          })*/
-         //  = item;
-
-         await Object.entries(item).forEach(([key, element]: any) =>{
-          this.FormularioDet['L'+element.linea+'_'+element.nombre] = element
-        })
-        console.log(this.FormularioDet);
-        //console.log(this.TablaFormularioDet)
+          await Object.entries(item).forEach(([key, element]: any) => {
+            this.FormularioDet['L' + element.linea + '_' + element.nombre] = element
+          })
+          console.log(this.FormularioDet);
+          //console.log(this.TablaFormularioDet)
         });
     });
   }
@@ -82,13 +79,13 @@ export class FormTablaCComponent implements OnInit {
       if (keyValid >= 0 && element.length !== 0) {
         let resultado = element.split('_');
         await this.dbQuery.openOrCreateDB().then(db => {
-          let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_form}' and estado = ? ORDER BY id DESC LIMIT 1`;
-          this.dbQuery.consultaAll(db, sql, 'A').then(result => {
-            console.log('id:'+result[0].id);
+          let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_form}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
+          this.dbQuery.consultaAll(db, sql, 'N').then(result => {
+            //console.log('id:'+result[0].id);
             let sql1 = `SELECT count(*) as cnt, id FROM rk_hc_form_det WHERE formulario_id = ${result[0].id} and linea = ${resultado[0]} and nombre = '${resultado[1]}' and tipo_pag = '${formulario.value.tipo_pag}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ? `;
             this.dbQuery.consultaAll(db, sql1, 'A')
               .then(resp => {
-                console.log(resp);
+                //  console.log(resp);
                 let data = [
                   result[0].id,
                   resultado[0],
@@ -100,11 +97,11 @@ export class FormTablaCComponent implements OnInit {
                   this.MyUser.dateNow()
                 ];
                 if (resp[0].cnt > 0) {
-                 // console.log(this.dbQuery.respuesta);
-               //   console.log(resp);
+                  // console.log(this.dbQuery.respuesta);
+                  //   console.log(resp);
                   db.executeSql(`UPDATE rk_hc_form_det SET formulario_id = ?, linea = ?,nombre=?,valor=?,tipo_pag=?,tipo_ubicacion=?,usuario_cre_id=?,fecha_cre=? WHERE id = ${resp[0].id}`, data)
                 } else {
-              //    console.log(resp);
+                  //    console.log(resp);
                   let sql = 'INSERT INTO rk_hc_form_det (formulario_id,linea,nombre,valor,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?,?)';
                   this.dbQuery.insertar(db, sql, data);
                 }
@@ -116,4 +113,15 @@ export class FormTablaCComponent implements OnInit {
       }
     });
   }
+
+  modoCamaraBool: boolean = true;
+  modoCamara() {
+    if (this.modoCamaraBool == true) {
+      this.modoCamaraBool = false;
+    } else {
+      this.modoCamaraBool = true;
+    }
+    console.log("modo camara: "+this.modoCamaraBool);
+  }
+
 }
