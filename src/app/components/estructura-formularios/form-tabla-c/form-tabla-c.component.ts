@@ -43,6 +43,7 @@ export class FormTablaCComponent implements OnInit {
   }
 
   TablaFormularioDet: any[] = [];
+  FormularioDet: any[] = [];
   constructor(public formBuilder: FormBuilder, private dbQuery: DbQuery, private MyUser: MyUserService) { }
 
   ngOnInit() {
@@ -51,10 +52,23 @@ export class FormTablaCComponent implements OnInit {
 
   consultarTabla() {
     this.dbQuery.openOrCreateDB().then(db => {
-      let sql = `SELECT * FROM rk_hc_form_det WHERE tipo_pag = '${this.tipo}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ?`;
+      let sql = `SELECT *  FROM rk_hc_form_det WHERE tipo_pag = '${this.tipo}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ?`;
       this.dbQuery.consultaAll(db, sql, 'A')
-        .then(item => {
+        .then(async item => {
           this.TablaFormularioDet = item;
+       //   console.log(item);
+         /* await Object.entries(item).forEach(([key, element]: any) =>{
+            console.log(key);
+            console.log(element);
+            this.TablaFormularioDet[element.linea+'_'+element.nombre][key] = element
+          })*/
+         //  = item;
+
+         await Object.entries(item).forEach(([key, element]: any) =>{
+          this.FormularioDet['L'+element.linea+'_'+element.nombre] = element
+        })
+        console.log(this.FormularioDet);
+        //console.log(this.TablaFormularioDet)
         });
     });
   }
@@ -71,14 +85,14 @@ export class FormTablaCComponent implements OnInit {
           let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_form}' and estado = ? ORDER BY id DESC LIMIT 1`;
           this.dbQuery.consultaAll(db, sql, 'A').then(result => {
             console.log('id:'+result[0].id);
-            let sql1 = `SELECT count(*) as cnt, id FROM rk_hc_form_det WHERE formulario_id = ${result[0].id} and linea = ${resultado[0]} and nombre = '${'C' + resultado[1]}' and tipo_pag = '${formulario.value.tipo_pag}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ? `;
+            let sql1 = `SELECT count(*) as cnt, id FROM rk_hc_form_det WHERE formulario_id = ${result[0].id} and linea = ${resultado[0]} and nombre = '${resultado[1]}' and tipo_pag = '${formulario.value.tipo_pag}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ? `;
             this.dbQuery.consultaAll(db, sql1, 'A')
               .then(resp => {
                 console.log(resp);
                 let data = [
                   result[0].id,
                   resultado[0],
-                  'C' + resultado[1],
+                  resultado[1],
                   resultado[2],
                   formulario.value.tipo_pag,
                   formulario.value.tipo_ubicacion,

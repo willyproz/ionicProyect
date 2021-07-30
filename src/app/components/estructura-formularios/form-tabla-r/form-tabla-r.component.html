@@ -46,7 +46,7 @@
                 <ng-container *ngFor="let itemHeadCuadrante of headCuadranteTable;let hc = index">
                   <td *ngFor="let itemHeadRama of headRamaTable;let hrt = index">
                     <p class="text-center p5 no-margin ">
-                      <ion-select placeholder="-----" ngModel name="L{{(iml+1)+'-C'+(hc+1)+'-R'+(hrt+1)}}">
+                      <ion-select placeholder="-----" ngModel name="L{{(iml+1)+'-C'+(hc+1)+'-R'+(hrt+1)}}" interface="action-sheet">
                         <ion-select-option *ngFor="let itemNotas of maxNotas;let inc = index" value="{{(iml+1)+'_'+(hc+1)+'_'+(hrt+1)+'_'+itemNotas}}">
                           {{itemNotas}}</ion-select-option>
                       </ion-select>

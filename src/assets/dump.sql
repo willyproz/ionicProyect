@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS rk_hc_form_det(
     fecha_mod DATETIME
 );
 
+
 CREATE TABLE IF NOT EXISTS rk_hc_usuario(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     cedula VARCHAR (13),
