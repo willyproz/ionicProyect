@@ -149,7 +149,7 @@ export class FormTablaRComponent implements OnInit {
     // If it's base64 (DATA_URL):
      /* const img = window.Ionic.WebView.convertFileSrc(imageData);
       console.log(info);*/
-     
+
       let base64Image = 'data:image/jpeg;base64,' + imageData;
       //this.tempImages.push(base64Image);
 
@@ -196,16 +196,22 @@ export class FormTablaRComponent implements OnInit {
 
 
 consultarImagenes() {
-this.dbQuery.openOrCreateDB().then(db => {
+/*this.dbQuery.openOrCreateDB().then(db => {*/
   //let sql = `SELECT *  FROM rk_hc_form_det WHERE tipo_pag = '${this.tipo}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ?`;
-  let sql = `SELECT d.* FROM rk_hc_form_files d
+  /*let sql = `SELECT d.* FROM rk_hc_form_files d
              INNER JOIN rk_hc_form_cab rhfc on rhfc.id = d.formulario_id
-             WHERE d.tipo_pag = '${this.tipo}' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?`;
-  this.dbQuery.consultaAll(db, sql, 'N')
+             WHERE d.tipo_pag = '${this.tipo}' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?`;*/
+
+  let sql = `SELECT d.formulario_id,count(*) as cnt,d.linea,d.cuadrante,d.rama FROM rk_hc_form_files d
+             INNER JOIN rk_hc_form_cab rhfc on rhfc.id = d.formulario_id
+             WHERE d.tipo_pag = '${this.tipo}' and d.tipo_ubicacion = 'R' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?
+             GROUP BY d.cuadrante, d.linea, d.rama`;
+  this.dbQuery.consultaAll('db', sql, 'N')
     .then(item => {
       this.tempImages = item;
     });
-})/*.catch(e => {
+
+/*})/*.catch(e => {
   localStorage.clear();
   this.router.navigate(['/login'])
 });*/

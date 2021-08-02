@@ -15,13 +15,13 @@ import { MyUserService } from '../utilitarios/myUser.service';
 export class Sync {
   public storage: SQLiteObject;
   public respuestaSync: any = '';
-  constructor(private platform: Platform, 
-              private dbQuery: DbQuery,
-              private sqlite: SQLite, 
-              private msgService: MsgTemplateService,
-              private httpClient: HttpClient,
-              private sqlPorter: SQLitePorter,
-              private MyUser: MyUserService) {
+  constructor(private platform: Platform,
+    private dbQuery: DbQuery,
+    private sqlite: SQLite,
+    private msgService: MsgTemplateService,
+    private httpClient: HttpClient,
+    private sqlPorter: SQLitePorter,
+    private MyUser: MyUserService) {
 
   }
 
@@ -37,17 +37,17 @@ export class Sync {
   }
 
 
-/* Sincronizar datos con el movil*/
+  /* Sincronizar datos con el movil*/
   async syncData(db) {
     const options = {
       headers:
-       new HttpHeaders(
-         {
-           'Content-Type': 'application/x-www-form-urlencoded'
-         }
-       )
-     };
-    await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda/accion/obtenerTablasSyncMovil',{
+        new HttpHeaders(
+          {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        )
+    };
+    await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda/accion/obtenerTablasSyncMovil', {
       headers:
         new HttpHeaders(
           {
@@ -57,57 +57,57 @@ export class Sync {
             'Access-Control-Allow-Methods': 'POST'
           }
         )
-    },options)
+    }, options)
       .toPromise().then(
         async (res) => {
           let resultado = 'ok';
           let mensaje = 'Datos sincronizados con exito';
 
           let resultadoProcesoSyncHacienda = await this.procesoSyncHacienda(db, res);
-          if(resultadoProcesoSyncHacienda.estado === 'error'){
+          if (resultadoProcesoSyncHacienda.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncHacienda.mensaje;
           }
 
           let resultadoProcesoSyncUsuario = await this.procesoSyncUsuario(db, res);
-          if(resultadoProcesoSyncUsuario.estado === 'error'){
+          if (resultadoProcesoSyncUsuario.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncUsuario.mensaje;
           }
 
           let resultadoProcesoSyncLote = await this.procesoSyncLote(db, res);
-          if(resultadoProcesoSyncLote.estado === 'error'){
+          if (resultadoProcesoSyncLote.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncLote.mensaje;
           }
 
           let resultadoProcesoSyncLoteDet = await this.procesoSyncLoteDet(db, res);
-          if(resultadoProcesoSyncLoteDet.estado === 'error'){
+          if (resultadoProcesoSyncLoteDet.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncLoteDet.mensaje;
           }
 
           let resultadoProcesoSyncFomularioCab = await this.procesoSyncFomularioCab(db, res);
-          if(resultadoProcesoSyncFomularioCab.estado === 'error'){
+          if (resultadoProcesoSyncFomularioCab.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncFomularioCab.mensaje;
           }
 
           let resultadoProcesoSyncFomularioDet = await this.procesoSyncFomularioDet(db, res);
-          if(resultadoProcesoSyncFomularioDet.estado === 'error'){
+          if (resultadoProcesoSyncFomularioDet.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncFomularioDet.mensaje;
           }
 
           let resultadoProcesoSyncTipoMuestra = await this.procesoSyncTipoMuestra(db, res);
-          if(resultadoProcesoSyncTipoMuestra.estado === 'error'){
+          if (resultadoProcesoSyncTipoMuestra.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncTipoMuestra.mensaje;
           }
 
-          if(resultado === 'ok'){
+          if (resultado === 'ok') {
             this.msgService.msgInfo(mensaje);
-          }else{
+          } else {
             this.msgService.msgError(mensaje);
           }
 
@@ -222,71 +222,88 @@ export class Sync {
     }).catch((err) => { return err });
   }*/
 
-/* Sincronizar datos con el server*/
+  /* Sincronizar datos con el server*/
 
-syncDataServer(db) {
-  var Formulario:any={}
-  this.dbQuery.consultaAll(db, `SELECT * FROM rk_hc_form_cab WHERE liquidado ='S' and sincronizado = ?`, 'N')
-  .then( async dataCab => {
-    
-    await Object.entries(dataCab).forEach(async ([key, element]: any) => {
-      Formulario['rk_hc_form_cab'] = element;
-     // await this.postDataServer(element);
-     await this.dbQuery.consultaAll(db, `SELECT * FROM rk_hc_form_det WHERE formulario_id = ${element.id} and sincronizado = ?`, 'N')
-      .then(dataDet => {
-        Formulario['rk_hc_form_det'] = dataDet;
-      });
-      await this.dbQuery.consultaAll(db, `SELECT * FROM rk_hc_form_files WHERE formulario_id = ${element.id} and sincronizado = ?`, 'N')
-      .then(dataFiles => {
-        Formulario['rk_hc_form_files'] = dataFiles;
-      });
-      console.log(Formulario);
-      this.postDataServer(Formulario,db);
-     });
-     if(dataCab.length < 1){
-      this.msgService.msgInfo('No tiene formularios disponibles para sincronizar con el servidor.');
-     }
-  });
-}
+  conteoLoadingEnd: number = 0;
+  syncDataServer(db) {
+    var Formulario: any = {}
+    this.dbQuery.consultaAll(db, `SELECT * FROM rk_hc_form_cab WHERE liquidado ='S' and sincronizado = ?`, 'N')
+      .then(async dataCab => {
+        let loading = await this.msgService.loadingCreate('Sincronizando datos por favor espere...');
+        this.msgService.loading(true, loading);
+        await Object.entries(dataCab).forEach(async ([key, element]: any) => {
+          Formulario['rk_hc_form_cab'] = element;
+          // await this.postDataServer(element);
+          await this.dbQuery.consultaAll(db, `SELECT * FROM rk_hc_form_det WHERE formulario_id = ${element.id} and sincronizado = ?`, 'N')
+            .then(dataDet => {
+              Formulario['rk_hc_form_det'] = dataDet;
+            });
+          await this.dbQuery.consultaAll(db, `SELECT * FROM rk_hc_form_files WHERE formulario_id = ${element.id} and sincronizado = ?`, 'N')
+            .then(dataFiles => {
+              Formulario['rk_hc_form_files'] = dataFiles;
+            });
+          await this.postDataServer(Formulario, db);
 
-postDataServer(datos,db) {
+        });
 
-  const options = {
-   headers:
-    new HttpHeaders(
-      {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    )
-  };
-  this.httpClient.post(`http://200.0.73.169:189/procesos/syncHacienda?accion=guardarDatosServer`,JSON.stringify(datos),options)
-    .toPromise().then(
-      (res:any) => {
-        console.log(res);
-        let resultado = 'ok';
-        let mensaje = 'Datos enviados con exito';
+        var timerInterval = setInterval(() => {
+          /*console.log(this.conteo);
+          console.log(dataCab.length);*/
+          if (this.conteoLoadingEnd === dataCab.length) {
+            this.msgService.loading(false, loading);
+            this.conteoLoadingEnd = 0;
+            clearInterval(timerInterval);
+          }
+        }, 100);
 
-        if(res.estado === 'ok'){
-          let data = [
-            'S',
-            localStorage.getItem('id_usuario'),
-            this.MyUser.dateNow()
-          ];
-          db.executeSql(`UPDATE rk_hc_form_cab SET sincronizado = ?,usuario_mod_id=?,fecha_mod=? WHERE id = ${res.mensaje}`, data).catch((res)=>{
-            this.msgService.msgError(res);
-          });
-          db.executeSql(`UPDATE rk_hc_form_det SET sincronizado = ?,usuario_mod_id=?,fecha_mod=? WHERE formulario_id = ${res.mensaje}`, data).catch((res)=>{
-            this.msgService.msgError(res);
-          });
-          db.executeSql(`UPDATE rk_hc_form_files SET sincronizado = ?,usuario_mod_id=?,fecha_mod=? WHERE formulario_id = ${res.mensaje}`, data).catch((res)=>{
-            this.msgService.msgError(res);
-          });
-          this.msgService.msgInfo(mensaje);
-        }else{
-          this.msgService.msgError(mensaje);
+        if (dataCab.length < 1) {
+          this.msgService.loading(false, loading);
+          this.msgService.msgInfo('No tiene formularios disponibles para sincronizar con el servidor.');
         }
-    });
-    
+
+      });
+  }
+
+  async postDataServer(datos, db) {
+
+    const options = {
+      headers:
+        new HttpHeaders(
+          {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        )
+    };
+    this.httpClient.post(`http://200.0.73.169:189/procesos/syncHacienda?accion=guardarDatosServer`, JSON.stringify(datos), options)
+      .toPromise().then(
+        (res: any) => {
+          console.log(res);
+          let mensaje = 'Datos enviados con exito';
+
+          if (res.estado === 'ok') {
+            let data = [
+              'S',
+              localStorage.getItem('id_usuario'),
+              this.MyUser.dateNow()
+            ];
+            db.executeSql(`UPDATE rk_hc_form_cab SET sincronizado = ?,usuario_mod_id=?,fecha_mod=? WHERE id = ${res.mensaje}`, data).catch((res) => {
+              this.msgService.msgError(res);
+            });
+            db.executeSql(`UPDATE rk_hc_form_det SET sincronizado = ?,usuario_mod_id=?,fecha_mod=? WHERE formulario_id = ${res.mensaje}`, data).catch((res) => {
+              this.msgService.msgError(res);
+            });
+            db.executeSql(`UPDATE rk_hc_form_files SET sincronizado = ?,usuario_mod_id=?,fecha_mod=? WHERE formulario_id = ${res.mensaje}`, data).catch((res) => {
+              this.msgService.msgError(res);
+            });
+
+            this.conteoLoadingEnd++;
+            this.msgService.msgInfo(mensaje);
+          } else {
+
+            this.msgService.msgError(mensaje);
+          }
+        });
+
   }
 
 }

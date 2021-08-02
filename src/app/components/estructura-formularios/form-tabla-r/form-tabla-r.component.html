@@ -198,10 +198,25 @@
   <div class="panel-heading text-center"><b>BASE DE DATOS IMG</b></div>
   <div class="panel-body"></div>
   <!-- Table -->
-  <ion-list>
-    <ion-item *ngFor="let tempimg of tempImages">
-      <img [src]="tempimg.img">
-    </ion-item>
-  </ion-list>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>FORM_ID</th>
+        <th>LINEA</th>
+        <th>CUADRANTE</th>
+        <th>RAMA</th>
+        <th>CNT</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of tempImages">
+        <td>{{data.formulario_id}}</td>
+        <td>{{data.linea}}</td>
+        <td>{{data.cuadrante}}</td>
+        <td>{{data.rama}}</td>
+        <td>{{data.cnt}}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 </ng-template>

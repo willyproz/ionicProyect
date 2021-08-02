@@ -4,14 +4,15 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class MyUserService {
-
   constructor() { }
 
   dateNow() {
-    var dt = new Date().toISOString().split('T');
+   var hoy = new Date().toTimeString().split('GMT-0500');
+   var dt = new Date().toISOString().split('T');
     let fecha = dt[0];
-    let time = dt[1].split('.')[0];
+    let time = hoy[0];
     let fechaFinal = fecha + " " + time;
+    console.log(fechaFinal);
     return fechaFinal;
   }
 

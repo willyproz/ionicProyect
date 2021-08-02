@@ -153,7 +153,10 @@
                 <td *ngFor="let itemNcuadrantes of maxCuadrantes;let inc = index">
                   <p class="text-center p5 no-margin ">
                     <ion-button expand="full" color="warning" (click)="camara((iml+1)+'_C'+(inc+1),tipo,'C')">
-                      <ion-icon name="camera-sharp"></ion-icon>
+                      <ion-icon name="camera-sharp"></ion-icon>&nbsp;
+                      <ion-badge *ngIf="tempImagesCons['L'+(iml+1)+'_C'+(inc+1)].cnt > 0" color="tertiary" type="ios">
+                        {{tempImagesCons['L'+(iml+1)+'_C'+(inc+1)].cnt}}
+                      </ion-badge>
                     </ion-button>
                   </p>
                 </td>
@@ -171,11 +174,24 @@
   <div class="panel-heading text-center"><b>BASE DE DATOS IMG</b></div>
   <div class="panel-body"></div>
   <!-- Table -->
-  <ion-list>
-    <ion-item *ngFor="let tempimg of tempImages">
-      <img [src]="tempimg.img">
-    </ion-item>
-  </ion-list>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>FORM_ID</th>
+        <th>LINEA</th>
+        <th>CUADRANTE</th>
+        <th>CNT</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of tempImagesTabla">
+        <td>{{data.formulario_id}}</td>
+        <td>{{data.linea}}</td>
+        <td>{{data.cuadrante}}</td>
+        <td>{{data.cnt}}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 </ng-template>
 

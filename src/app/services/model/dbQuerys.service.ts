@@ -15,10 +15,12 @@ import { Router } from '@angular/router';
 
 export class DbQuery {
   public storage: SQLiteObject;
-
+  db:any;
   constructor(private platform: Platform,private router:Router,private sqlite: SQLite,private httpClient: HttpClient, private sqlPorter: SQLitePorter)
   {
-
+    this.openOrCreateDB().then((db)=>{
+      this.db = db;
+    });
   }
 
   openOrCreateDB(){
@@ -31,7 +33,7 @@ export class DbQuery {
   }
 
   consultaAll(db,sql,search?){
-    return db.executeSql(sql, [search]).then(res => {
+    return this.db.executeSql(sql, [search]).then(res => {
       let items: any[] = [];
       if (res.rows.length > 0) {
         for (var i = 0; i < res.rows.length; i++) {
@@ -64,7 +66,7 @@ export class DbQuery {
   public respuesta:any;
 
   insertar(db,sql,data) {
-    return db.executeSql(sql, data)
+    return this.db.executeSql(sql, data)
     .then(res => {
       if(res.rowsAffected > 0){
         this.respuesta={
@@ -102,8 +104,8 @@ export class DbQuery {
         localStorage.clear();
         this.router.navigate(['/login'])
       });
-     }); 
-      
+     });
+
   }
 
   validarLogin():Observable<any>{

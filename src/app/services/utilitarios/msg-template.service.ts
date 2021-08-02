@@ -12,7 +12,7 @@ export class MsgTemplateService {
 
 
   msgOk(msg: string = 'Datos grabados con exito') {
-    Swal.fire("OK", msg, 'success');
+    Swal.fire(msg, '', 'success');
 
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");
@@ -26,7 +26,7 @@ export class MsgTemplateService {
   }
 
   msgError(msg: string) {
-    Swal.fire("ERROR", msg, 'error');
+    Swal.fire(msg,'', 'error');
 
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");
