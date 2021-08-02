@@ -154,7 +154,7 @@
                   <p class="text-center p5 no-margin ">
                     <ion-button expand="full" color="warning" (click)="camara((iml+1)+'_C'+(inc+1),tipo,'C')">
                       <ion-icon name="camera-sharp"></ion-icon>&nbsp;
-                      <ion-badge *ngIf="tempImagesCons['L'+(iml+1)+'_C'+(inc+1)].cnt > 0" color="tertiary" type="ios">
+                      <ion-badge *ngIf="tempImagesCons['L'+(iml+1)+'_C'+(inc+1)]?.cnt > 0" color="tertiary" type="ios">
                         {{tempImagesCons['L'+(iml+1)+'_C'+(inc+1)].cnt}}
                       </ion-badge>
                     </ion-button>
