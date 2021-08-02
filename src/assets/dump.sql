@@ -1,38 +1,4 @@
-CREATE TABLE IF NOT EXISTS rk_hc_form_cab(
-    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    hacienda_id INTEGER,
-    lote VARCHAR(10),
-    modulo VARCHAR(10),
-    empresa_id INTEGER,
-    tipo_muestra_id INTEGER,
-    observacion TEXT,
-    estado CHAR(1) DEFAULT 'A',
-    liquidado CHAR(1) DEFAULT 'N',
-    tipo_form VARCHAR(10),
-    usuario_cre_id INTEGER,
-    fecha_cre DATETIME,
-    usuario_mod_id INTEGER,
-    fecha_mod DATETIME
-);
-
-
-CREATE TABLE IF NOT EXISTS rk_hc_form_det(
-    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    formulario_id INTEGER,
-    linea INTEGER,
-    nombre VARCHAR(30),
-    valor INTEGER,
-    nombre2 VARCHAR(30),
-    valor2 INTEGER,
-    tipo_pag VARCHAR(100),
-    tipo_ubicacion CHAR(1),
-    estado CHAR(1) DEFAULT 'A',
-    usuario_cre_id INTEGER,
-    fecha_cre DATETIME,
-    usuario_mod_id INTEGER,
-    fecha_mod DATETIME
-);
-
+/*Tablas que se sincronizan con el movil*/
 
 CREATE TABLE IF NOT EXISTS rk_hc_usuario(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -156,5 +122,61 @@ CREATE TABLE IF NOT EXISTS rk_hc_tipo_muestra(
     fecha_cre DATETIME,
     usuario_mod_id INTEGER,
     fecha_mod DATETIME
+);
+
+/*Tablas que se sincronizan con el servidor*/
+
+CREATE TABLE IF NOT EXISTS rk_hc_form_cab(
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    hacienda_id INTEGER,
+    lote VARCHAR(10),
+    modulo VARCHAR(10),
+    empresa_id INTEGER,
+    tipo_muestra_id INTEGER,
+    observacion TEXT,
+    estado CHAR(1) DEFAULT 'A',
+    liquidado CHAR(1) DEFAULT 'N',
+    tipo_form VARCHAR(10),
+    usuario_cre_id INTEGER,
+    fecha_cre DATETIME,
+    usuario_mod_id INTEGER,
+    fecha_mod DATETIME,
+    sincronizado CHAR(1) DEFAULT 'N'
+);
+
+
+CREATE TABLE IF NOT EXISTS rk_hc_form_det(
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    formulario_id INTEGER,
+    linea INTEGER,
+    nombre VARCHAR(30),
+    valor INTEGER,
+    nombre2 VARCHAR(30),
+    valor2 INTEGER,
+    tipo_pag VARCHAR(100),
+    tipo_ubicacion CHAR(1),
+    estado CHAR(1) DEFAULT 'A',
+    usuario_cre_id INTEGER,
+    fecha_cre DATETIME,
+    usuario_mod_id INTEGER,
+    fecha_mod DATETIME,
+    sincronizado CHAR(1) DEFAULT 'N'
+);
+
+CREATE TABLE IF NOT EXISTS rk_hc_form_files(
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    formulario_id INTEGER,
+    linea INTEGER,
+    cuadrante CHAR(2),
+    rama CHAR(2),
+    img TEXT,
+    tipo_pag VARCHAR (10),
+    tipo_ubicacion CHAR(1),
+    estado CHAR(1) DEFAULT 'A',
+    usuario_cre_id INTEGER,
+    fecha_cre DATETIME,
+    usuario_mod_id INTEGER,
+    fecha_mod DATETIME,
+    sincronizado CHAR(1) DEFAULT 'N'
 );
 

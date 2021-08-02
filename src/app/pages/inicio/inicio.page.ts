@@ -27,7 +27,6 @@ export class InicioPage implements OnInit {
   }
 
   menuTemp   = [
-    {'nombre':  'ADMINISTRAR', 'icono' : 'print', 'clase' : 'Comex', 'ruta' : '', 'estado' : ''},
     {'nombre':  'CONSULTAR', 'icono' : 'ticket', 'clase' : 'Compras', 'ruta' : '/consulta', 'estado' : 'disabled'},
     {'nombre':  'FORMULARIOS', 'icono' : 'eye', 'clase' : 'Planta', 'ruta' : '/formulario', 'estado': 'disabled'},
  ];
@@ -46,7 +45,21 @@ export class InicioPage implements OnInit {
     this.sync.openOrCreateDB().then(res => {
       this.sync.syncData(res).then(() => {
         this.msg.loading(false, loading)
+      }).catch(e => {
+        localStorage.clear();
+        this.router.navigate(['/login'])
       });
+    }).catch(e => {
+      localStorage.clear();
+      this.router.navigate(['/login'])
+    });
+  }
+
+  async syncronizeServer() {
+    //let loading = await this.msg.loadingCreate('Sincronizando datos por favor espere...');
+  //  this.msg.loading(true, loading)
+    this.sync.openOrCreateDB().then(db => {
+      this.sync.syncDataServer(db)
     });
   }
 

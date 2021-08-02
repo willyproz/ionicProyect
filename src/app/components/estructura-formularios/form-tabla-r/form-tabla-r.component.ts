@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, NgForm } from '@angular/forms';
 import { DbQuery } from 'src/app/services/model/dbQuerys.service';
 import { MyUserService } from 'src/app/services/utilitarios/myUser.service';
+import { Camera,CameraOptions } from '@ionic-native/camera/ngx';
 
 @Component({
   selector: 'app-form-tabla-r',
@@ -53,10 +54,14 @@ export class FormTablaRComponent implements OnInit {
   TablaFormularioDet: any[] = [];
   FormularioDet: any[] = [];
 
-  constructor(public formBuilder: FormBuilder, private dbQuery: DbQuery, private MyUser: MyUserService) { }
+  constructor(public formBuilder: FormBuilder,
+              private dbQuery: DbQuery,
+              private camera:Camera,
+              private MyUser: MyUserService) { }
 
   ngOnInit() {
     this.consultarTabla();
+    this.consultarImagenes();
   }
 
 
@@ -117,5 +122,93 @@ export class FormTablaRComponent implements OnInit {
     });
   }
 
+// CODIGO PARA GRABAR SECCION SUBIDA DE IMAGENES
+  tempImages:any[]=[];
+  modoCamaraBool: boolean = true;
+  modoCamara() {
+    if (this.modoCamaraBool == true) {
+      this.modoCamaraBool = false;
+    } else {
+      this.modoCamaraBool = true;
+    }
+    console.log("modo camara: "+this.modoCamaraBool);
+  }
+
+  camara(info:any,tipo_pag:string,tipo_ubicacion:string){
+    const options: CameraOptions = {
+      quality: 70,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      encodingType: this.camera.EncodingType.JPEG,
+      mediaType: this.camera.MediaType.PICTURE,
+      correctOrientation:true,
+      sourceType:this.camera.PictureSourceType.CAMERA
+    }
+
+    this.camera.getPicture(options).then((imageData) => {
+    // imageData is either a base64 encoded string or a file URI
+    // If it's base64 (DATA_URL):
+     /* const img = window.Ionic.WebView.convertFileSrc(imageData);
+      console.log(info);*/
+     
+      let base64Image = 'data:image/jpeg;base64,' + imageData;
+      //this.tempImages.push(base64Image);
+
+      this.insertarImagen(info,tipo_pag,tipo_ubicacion,base64Image);
+
+     // console.log(base64Image);
+    }, (err) => {
+    // Handle error
+    });
+  }
+
+
+  insertarImagen(data:any,tipo_pag:string,tipo_ubicacion:string,img:any) {
+    let resultado = data.split('_');
+    this.dbQuery.openOrCreateDB().then(db => {
+      let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_form}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
+      this.dbQuery.consultaAll(db, sql, 'N').then(result => {
+        let data = [
+          result[0].id,
+          resultado[0],
+          resultado[1],
+          resultado[2],
+          img,
+          tipo_pag,
+          tipo_ubicacion,
+          localStorage.getItem('id_usuario'),
+          this.MyUser.dateNow()
+        ];
+        console.log(data);
+        let sql = 'INSERT INTO rk_hc_form_files (formulario_id,linea,cuadrante,rama,img,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?,?,?)';
+        this.dbQuery.insertar(db, sql, data)/*.then((c)=>{
+          this.msg.toastMsg('Foto agregada correctamente. Linea:'+resultado[0]+', '+resultado[1],'success');
+        }).catch((err)=>{
+          this.msg.toastMsg(err,'error');
+        });*/
+        this.consultarImagenes();
+      })/*.catch(e => {
+        console.log(e);
+        localStorage.clear();
+        this.router.navigate(['/login'])
+      });*/
+    });
+}
+
+
+consultarImagenes() {
+this.dbQuery.openOrCreateDB().then(db => {
+  //let sql = `SELECT *  FROM rk_hc_form_det WHERE tipo_pag = '${this.tipo}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ?`;
+  let sql = `SELECT d.* FROM rk_hc_form_files d
+             INNER JOIN rk_hc_form_cab rhfc on rhfc.id = d.formulario_id
+             WHERE d.tipo_pag = '${this.tipo}' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?`;
+  this.dbQuery.consultaAll(db, sql, 'N')
+    .then(item => {
+      this.tempImages = item;
+    });
+})/*.catch(e => {
+  localStorage.clear();
+  this.router.navigate(['/login'])
+});*/
+}
 
 }

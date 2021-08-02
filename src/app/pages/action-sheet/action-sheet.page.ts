@@ -55,10 +55,9 @@ export class ActionSheetPage implements OnInit {
   btnSiguiente() {
     //console.log(this.FormStruct[0].sigla);
     this.dbQuery.openOrCreateDB().then(db => {
-      let sql = `SELECT count(*) as cnt FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.FormStruct[0].sigla}' and estado = ?`;
-      this.dbQuery.consultaAll(db, sql, 'A')
+      let sql = `SELECT count(*) as cnt FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.FormStruct[0].sigla}' and liquidado = ?`;
+      this.dbQuery.consultaAll(db, sql, 'N')
         .then(resp => {
-          console.log(resp);
           if (resp[0].cnt > 0) {
 
             var cntInput: any = ((document.getElementById('cntForm') as HTMLInputElement).value);

@@ -6,6 +6,7 @@ import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
 import {Md5} from 'ts-md5/dist/md5';
 import {from as fromPromise,Observable } from 'rxjs';
 import { map,tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -15,20 +16,18 @@ import { map,tap } from 'rxjs/operators';
 export class DbQuery {
   public storage: SQLiteObject;
 
-  constructor(private platform: Platform,private sqlite: SQLite,private httpClient: HttpClient, private sqlPorter: SQLitePorter)
+  constructor(private platform: Platform,private router:Router,private sqlite: SQLite,private httpClient: HttpClient, private sqlPorter: SQLitePorter)
   {
 
   }
 
-  async openOrCreateDB(){
-     return await this.sqlite.create({
+  openOrCreateDB(){
+     return this.sqlite.create({
         name: 'positronx_db.db',
         location: 'default'
-      })
-        .then((db: SQLiteObject) => {
+      }).then((db: SQLiteObject) => {
          return db;
         })
-        //.catch(e => console.log(e));
   }
 
   consultaAll(db,sql,search?){
@@ -40,7 +39,11 @@ export class DbQuery {
         }
       }
       return items;
-    });
+    })
+    /*.catch(e => {
+      localStorage.clear();
+      this.router.navigate(['/login'])
+    });*/
   }
 
   consultaLogin(db,sql,search?){
@@ -52,7 +55,10 @@ export class DbQuery {
         }
       }
       return items;
-    });
+    }) .catch(e => {
+      localStorage.clear();
+      this.router.navigate(['/login'])
+    });;
   }
 
   public respuesta:any;
@@ -71,7 +77,10 @@ export class DbQuery {
           mensaje: res
         }
       }
-    });
+    })/*.catch(e => {
+      localStorage.clear();
+      this.router.navigate(['/login'])
+    });*/
   }
 
   async  validarPromise(){
@@ -89,10 +98,13 @@ export class DbQuery {
         }else{
           resolve(false);
         }
+      }).catch(e => {
+        localStorage.clear();
+        this.router.navigate(['/login'])
       });
      }); 
-       
-     }
+      
+  }
 
   validarLogin():Observable<any>{
   //  console.log('validando');

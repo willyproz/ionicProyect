@@ -75,14 +75,14 @@
   </ion-row>
   <ion-row>
     <ion-col>
-      <ion-button *ngIf="FormularioCab.length > 0 ; else liquidartag" (click)="liquidarFormulario()" type="button" size="large" color="danger" expand="block">
-        <ion-icon name="warning-outline"></ion-icon>
-        Liquidar
+      <ion-button *ngIf="FormularioCab.length < 1 ; else liquidartag" type="submit" size="large" color="tertiary" expand="block">
+        <ion-icon name="checkmark-outline"></ion-icon>
+        Grabar
       </ion-button>
       <ng-template #liquidartag>
-        <ion-button  type="submit" size="large" color="tertiary" expand="block">
-          <ion-icon name="checkmark-outline"></ion-icon>
-          Grabar
+        <ion-button  (click)="liquidarFormulario()" type="button" size="large" color="danger" expand="block">
+          <ion-icon name="warning-outline"></ion-icon>
+          Liquidar
         </ion-button>
       </ng-template>
     </ion-col>
@@ -97,14 +97,14 @@
     <thead>
       <tr>
         <th>ID</th>
-        <th>TIPO FORM</th>
-        <th>HACIENDA</th>
+        <th>T. FORM</th>
+        <th>HAC</th>
         <th>MUESTRA</th>
         <th>LOTE</th>
         <th>MODULO</th>
-        <th>USUARIO CRE</th>
-        <th>FECHA CRE</th>
-        <th>LIQUIDADO</th>
+        <th>USU_CRE</th>
+        <th>FEC_CRE</th>
+        <th>LIQ.</th>
       </tr>
     </thead>
     <tbody>

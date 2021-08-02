@@ -1,21 +1,25 @@
+<style>
+   .scroll1 {
+     overflow:scroll;
+     height:70%;
+     width:100%;
+}
+</style>
 <!-- tabla de data -->
 <form *ngIf="modoCamaraBool === true; else tablaImagenestag" (ngSubmit)="insertarFormulario(Formulario)"
   #Formulario="ngForm">
   <div class="panel panel-primary">
-    <div class="panel-heading p5" style="position: relative;">
-      <div style="position: absolute;left: 87%;">
-        <ion-button (click)="modoCamara()" color="warning">
-          <ion-icon name="camera-reverse-sharp"></ion-icon>
+    <div class="panel-heading">
+        <ion-button style="margin: 0 !important; padding: 0 !important" size="large" expand="full" (click)="modoCamara()" color="primary">
+          <h6 class="text-center no-margin">{{titulo}}</h6> <ion-icon name="camera-reverse-sharp"></ion-icon>
         </ion-button>
-      </div>
-      <h6 class="text-center no-margin">{{titulo}}</h6>
       <div style="clear:both"></div>
     </div>
     <div class="panel-body p5">
       <input type="hidden" class="form-control" [(ngModel)]="tipo" name="tipo_pag">
       <input type="hidden" class="form-control" ngModel="C" name="tipo_ubicacion">
       <div>
-        <div class="pre-scrollable">
+        <div class="scroll1">
           <table class="table table-striped table-bordered table-hover no-padding sticky_header">
             <thead>
               <tr class="i"
@@ -71,31 +75,64 @@
       </div>
     </div>
     <div class="col-xs-12 text-center">
-      <ion-button type="submit" size="large" color="tertiary" expand="block">
+      <ion-button type="submit" size="large" color="tertiary" expand="full">
         <ion-icon name="checkmark-outline"></ion-icon>
         Grabar
       </ion-button>
     </div>
+  </div>
+  <div style="clear:both"></div>
+  <br>
+  <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading text-center"><b>BASE DE DATOS</b></div>
+    <div class="panel-body"></div>
+    <!-- Table -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>FORM_ID</th>
+          <th>LINEA</th>
+          <th>COL.</th>
+          <th>VALOR</th>
+          <th>PAGINA</th>
+          <th>TIPO</th>
+          <th>USU_CRE</th>
+          <th>FEC_CRE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of TablaFormularioDet">
+          <td>{{data.id}}</td>
+          <td>{{data.formulario_id}}</td>
+          <td>{{data.linea}}</td>
+          <td>{{data.nombre}}</td>
+          <td>{{data.valor}}</td>
+          <td>{{data.tipo_pag}}</td>
+          <td>{{data.tipo_ubicacion}}</td>
+          <td>{{data.usuario_cre_id}}</td>
+          <td>{{data.fecha_cre}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </form>
 
 <!--tabla de images-->
 <ng-template #tablaImagenestag>
   <div class="panel panel-primary">
-    <div class="panel-heading p5" style="position: relative;">
-      <div style="position: absolute;left: 87%;">
-        <ion-button (click)="modoCamara()" color="warning">
-          <ion-icon name="camera-reverse-sharp"></ion-icon>
-        </ion-button>
-      </div>
-      <h6 class="text-center no-margin">{{titulo}}</h6>
-      <div style="clear:both"></div>
+    <div class="panel-heading p5">
+      <ion-button style="margin: 0 !important; padding: 0 !important" size="large" expand="full" (click)="modoCamara()" color="primary">
+        <h6 class="text-center no-margin">{{titulo}}</h6> <ion-icon name="camera-reverse-sharp"></ion-icon>
+      </ion-button>
+    <div style="clear:both"></div>
     </div>
     <div class="panel-body p5">
       <input type="hidden" class="form-control" [(ngModel)]="tipo" name="tipo_pag">
       <input type="hidden" class="form-control" ngModel="C" name="tipo_ubicacion">
       <div>
-        <div class="pre-scrollable">
+        <div class="scroll1">
           <table class="table table-striped table-bordered table-hover no-padding sticky_header">
             <thead>
               <tr class="i"
@@ -115,7 +152,7 @@
                 </td>
                 <td *ngFor="let itemNcuadrantes of maxCuadrantes;let inc = index">
                   <p class="text-center p5 no-margin ">
-                    <ion-button expand="full" color="warning">
+                    <ion-button expand="full" color="warning" (click)="camara((iml+1)+'_C'+(inc+1),tipo,'C')">
                       <ion-icon name="camera-sharp"></ion-icon>
                     </ion-button>
                   </p>
@@ -127,39 +164,19 @@
       </div>
     </div>
   </div>
-</ng-template>
-
+  <div style="clear:both"></div>
+  <br>
 <div class="panel panel-default">
   <!-- Default panel contents -->
-  <div class="panel-heading text-center"><b>BASE DE DATOS</b></div>
+  <div class="panel-heading text-center"><b>BASE DE DATOS IMG</b></div>
   <div class="panel-body"></div>
   <!-- Table -->
-  <table class="table">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>FORMULARIO_ID</th>
-        <th>LINEA</th>
-        <th>COLUMNA</th>
-        <th>VALOR</th>
-        <th>PAGINA</th>
-        <th>TIPO</th>
-        <th>USUARIO CRE</th>
-        <th>FECHA CRE</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let data of TablaFormularioDet">
-        <td>{{data.id}}</td>
-        <td>{{data.formulario_id}}</td>
-        <td>{{data.linea}}</td>
-        <td>{{data.nombre}}</td>
-        <td>{{data.valor}}</td>
-        <td>{{data.tipo_pag}}</td>
-        <td>{{data.tipo_ubicacion}}</td>
-        <td>{{data.usuario_cre_id}}</td>
-        <td>{{data.fecha_cre}}</td>
-      </tr>
-    </tbody>
-  </table>
+  <ion-list>
+    <ion-item *ngFor="let tempimg of tempImages">
+      <img [src]="tempimg.img">
+    </ion-item>
+  </ion-list>
 </div>
+</ng-template>
+
+
