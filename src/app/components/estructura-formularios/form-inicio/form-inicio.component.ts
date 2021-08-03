@@ -18,6 +18,7 @@ export class FormInicioComponent implements OnInit {
   @Input() tituloTabla: string = '';
   @Input() set tipo_form(_data: any) {
     this.tipo_formulario = _data;
+    this.llenarSelects();
     this.consultarTabla();
   };
 
@@ -38,7 +39,7 @@ export class FormInicioComponent implements OnInit {
 
 
   ionViewWillEnter() {
-    this.consultarTabla();
+    //this.consultarTabla();
   }
 
   SelectHacienda: any[] = [];
@@ -51,8 +52,54 @@ export class FormInicioComponent implements OnInit {
     hacienda_id: 0
   }];
 
+  llenarSelects() {
+
+    let sqlHacienda = `select rhh.id as codigo, rhh.nombre as descripcion
+                       from rk_hc_persona_formulario_hacienda rp
+                       left join rk_hc_hacienda rhh on rhh.id = rp.hacienda_id
+                       left join rk_hc_formulario rf on rf.id = rp.formulario_id
+                       where rp.usuario_id = ${localStorage.getItem('id_usuario')} and rf.sigla = '${this.tipo_formulario}' and rp.estado = ?
+                       GROUP BY rp.hacienda_id`;
+
+    this.dbQuery.consultaAll('db', sqlHacienda, 'A')
+      .then(item => {
+        this.SelectHacienda = item;
+        console.log(item);
+      }).catch(e => {
+        console.log(e);
+        localStorage.clear();
+        this.router.navigate(['/login'])
+      });
+
+    this.dbQuery.consultaAll('db', 'SELECT id as codigo, lote as descripcion FROM rk_hc_lote WHERE estado = ?', 'A')
+      .then(item => {
+        this.SelectLote = item;
+      }).catch(e => {
+        localStorage.clear();
+        this.router.navigate(['/login'])
+      });;
+
+
+    this.dbQuery.consultaAll('db', 'SELECT id as codigo, modulo as descripcion  FROM rk_hc_lote_det WHERE estado = ?', 'A')
+      .then(item => {
+        this.SelectModulo = item;
+      }).catch(e => {
+        localStorage.clear();
+        this.router.navigate(['/login'])
+      });;
+
+    this.dbQuery.consultaAll('db', 'SELECT id as codigo, nombre as descripcion FROM rk_hc_tipo_muestra WHERE estado = ?', 'A')
+      .then(item => {
+        this.SelectTipoMuestra = item;
+      }).catch(e => {
+        localStorage.clear();
+        this.router.navigate(['/login'])
+      });
+  }
+
+
   ngOnInit() {
-    this.consultarTabla();
+   // this.consultarTabla();
 
     this.Formulario = this.formBuilder.group({
       responsable_id: [''],
@@ -61,44 +108,6 @@ export class FormInicioComponent implements OnInit {
       modulo_id: [''],
       tipo_muestra_id: ['']
     });
-
-
-
-    /*this.dbQuery.openOrCreateDB().then(db => {*/
-      this.dbQuery.consultaAll('db', 'SELECT id as codigo, nombre as descripcion  FROM rk_hc_hacienda  WHERE estado = ?', 'A')
-        .then(item => {
-          this.SelectHacienda = item;
-        }).catch(e => {
-          localStorage.clear();
-          this.router.navigate(['/login'])
-        });
-
-      this.dbQuery.consultaAll('db', 'SELECT id as codigo, lote as descripcion FROM rk_hc_lote WHERE estado = ?', 'A')
-        .then(item => {
-          this.SelectLote = item;
-        }).catch(e => {
-          localStorage.clear();
-          this.router.navigate(['/login'])
-        });;
-
-
-      this.dbQuery.consultaAll('db', 'SELECT id as codigo, modulo as descripcion  FROM rk_hc_lote_det WHERE estado = ?', 'A')
-        .then(item => {
-          this.SelectModulo = item;
-        }).catch(e => {
-          localStorage.clear();
-          this.router.navigate(['/login'])
-        });;
-
-      this.dbQuery.consultaAll('db', 'SELECT id as codigo, nombre as descripcion FROM rk_hc_tipo_muestra WHERE estado = ?', 'A')
-        .then(item => {
-          this.SelectTipoMuestra = item;
-        }).catch(e => {
-          localStorage.clear();
-          this.router.navigate(['/login'])
-        });;
-
-    /*})*/
   }
 
 
@@ -112,37 +121,68 @@ export class FormInicioComponent implements OnInit {
 
   consultarTabla() {
     /*this.dbQuery.openOrCreateDB().then(db => {*/
-      let sql = `SELECT * FROM rk_hc_form_cab WHERE tipo_form = '${this.tipo_formulario}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and liquidado = ?`;
-      this.dbQuery.consultaAll('db', sql, 'N')
-        .then(item => {
-          this.FormularioCab = item;
-        }).catch(e => {
-          localStorage.clear();
-          this.router.navigate(['/login'])
-        });
+    let sql = `SELECT * FROM rk_hc_form_cab WHERE tipo_form = '${this.tipo_formulario}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and liquidado = ?`;
+    this.dbQuery.consultaAll('db', sql, 'N')
+      .then(item => {
+        this.FormularioCab = item;
+      }).catch(e => {
+        localStorage.clear();
+        this.router.navigate(['/login'])
+      });
     /*});*/
 
     /*this.dbQuery.openOrCreateDB().then(db => {*/
-      let sql1 = `SELECT ca.tipo_form, ca.id, rhh.nombre as hacienda, ca.lote,ca.modulo, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.tipo_form = '${this.tipo_formulario}' and ca.liquidado = ?`;
-      this.dbQuery.consultaAll('db', sql1, 'N')
-        .then(item => {
-          this.TablaFormularioCab = item;
-        }).catch(e => {
-          localStorage.clear();
-          this.router.navigate(['/login'])
-        });
-   /* });*/
+    let sql1 = `SELECT ca.tipo_form, ca.id, rhh.nombre as hacienda, ca.lote,ca.modulo, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.tipo_form = '${this.tipo_formulario}' and ca.liquidado = ?`;
+    this.dbQuery.consultaAll('db', sql1, 'N')
+      .then(item => {
+        this.TablaFormularioCab = item;
+      }).catch(e => {
+        localStorage.clear();
+        this.router.navigate(['/login'])
+      });
+    /* });*/
   }
 
+  validarFormulario(formulario) {
+    let formValid = true;
+    let mensaje = '<ul>';
+    if (formulario.value.hacienda_id.length > 0 && formulario.value.hacienda_id > 0) {
+      console.log(formulario.value.hacienda_id);
 
+    } else {
+      formValid = false;
+      mensaje += '<li>DEBE SELECCIONAR UNA HACIENDA.</li>';
+    }
+
+    if (formulario.value.lote_id.length > 0) {
+
+    } else {
+      formValid = false;
+      mensaje += '<li>DEBE SELECCIONAR UN LOTE.</li>';
+    }
+
+    if (formulario.value.tipo_muestra_id.length > 0) {
+
+    } else {
+      formValid = false;
+      mensaje += '<li>DEBE SELECCIONAR UN TIPO DE MUESTRA.</li>';
+    }
+    mensaje += '</ul>';
+    return {
+      estado: formValid,
+      mensaje: mensaje
+    }
+  }
 
   insertarFormulario() {
-    let formValid = false;
-    if(this.Formulario.value.hacienda_id.length > 0 && this.Formulario.value.lote_id.length > 0 && this.Formulario.value.tipo_muestra_id.length > 0 ){
+
+    /*if (this.Formulario.value.hacienda_id.length > 0 && this.Formulario.value.lote_id.length > 0 && this.Formulario.value.tipo_muestra_id.length > 0) {
       formValid = true;
-    }
-    //console.log(this.Formulario.valid);
-    /*this.dbQuery.openOrCreateDB().then(db => {*/
+    }*/
+    let formValid = this.validarFormulario(this.Formulario);
+    if (formValid.estado === true) {
+      //console.log(this.Formulario.valid);
+      /*this.dbQuery.openOrCreateDB().then(db => {*/
       let sql = `SELECT count(*) as cnt FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_formulario}' and liquidado = ? `;
       this.dbQuery.consultaAll('db', sql, 'N')
         .then(resp => {
@@ -151,7 +191,7 @@ export class FormInicioComponent implements OnInit {
 
             this.msg.msgConfirmar().then((result) => {
               if (result.isConfirmed) {
-                if (formValid === true) {
+                if (formValid.estado === true) {
                   let data = [
                     this.tipo_formulario,
                     this.Formulario.value.hacienda_id,
@@ -161,27 +201,25 @@ export class FormInicioComponent implements OnInit {
                     localStorage.getItem('id_usuario'),
                     this.MyUser.dateNow()
                   ];
-                 /* this.dbQuery.openOrCreateDB().then(db => {*/
-                    this.dbQuery.insertar('db', 'INSERT INTO rk_hc_form_cab (tipo_form,hacienda_id,lote,modulo,tipo_muestra_id,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?)', data)
-                      .then(() => {
-                        if (this.dbQuery.respuesta.estado === 'ok') {
-                          this.Formulario.reset({
-                            responsable_id: localStorage.getItem('id_usuario')
-                          });
-                          this.msg.toastMsg('Grabado con exito', 'success');
-                          this.consultarTabla();
-                        } else {
-                          this.msg.msgError('No se pudo agregar formulario a la Base de Datos.');
-                        }
-                        this.dbQuery.respuesta = {};
-                      });
+                  /* this.dbQuery.openOrCreateDB().then(db => {*/
+                  this.dbQuery.insertar('db', 'INSERT INTO rk_hc_form_cab (tipo_form,hacienda_id,lote,modulo,tipo_muestra_id,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?)', data)
+                    .then(() => {
+                      if (this.dbQuery.respuesta.estado === 'ok') {
+                        this.Formulario.reset({
+                          responsable_id: localStorage.getItem('id_usuario')
+                        });
+                        this.msg.toastMsg('Grabado con exito', 'success');
+                        this.consultarTabla();
+                      } else {
+                        this.msg.msgError('No se pudo agregar formulario a la Base de Datos.');
+                      }
+                      this.dbQuery.respuesta = {};
+                    });
                   /*});*/
-                } else {
-                  this.msg.msgError('Favor verificar que los campos del formulario no esten vacios');
+                } else if (result.isDenied) {
+                  //  this.msg.msgInfo('Formulario no guardado');
+                  this.msg.toastMsg('Formulario no guardado.', 'info');
                 }
-              } else if (result.isDenied) {
-                //  this.msg.msgInfo('Formulario no guardado');
-                this.msg.toastMsg('Formulario no guardado.', 'info');
               }
             });
           } else {
@@ -191,6 +229,9 @@ export class FormInicioComponent implements OnInit {
           localStorage.clear();
           this.router.navigate(['/login'])
         });
+    } else {
+      this.msg.msgError(formValid.mensaje);
+    }
     /*});*/
   }
 

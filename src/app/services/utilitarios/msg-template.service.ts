@@ -27,7 +27,13 @@ export class MsgTemplateService {
 
   msgError(msg: string) {
     Swal.fire(msg,'', 'error');
-
+    //confirmButtonText:     '<span style="font-size: 17px !important"><i class="fa fa-close"></i> OK :( </span>'
+    Swal.fire({
+      title: '<strong>'+msg+'</strong>',
+      icon: 'error',
+      confirmButtonText:
+        '<span style="font-size: 17px !important">ENTENDIDO :( </span>'
+    });
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");
   }

@@ -24,6 +24,8 @@ export class Sync {
     private MyUser: MyUserService) {
 
   }
+  //ruta principal para sincronizar de 2 vias: dispositivo al server y server al dispositivo
+  urlPost = 'http://200.0.73.169:189/procesos/syncHacienda';
 
   openOrCreateDB() {
     return this.sqlite.create({
@@ -47,7 +49,7 @@ export class Sync {
           }
         )
     };
-    await this.httpClient.post('http://200.0.73.169:189/procesos/syncHacienda/accion/obtenerTablasSyncMovil', {
+    await this.httpClient.post(`${this.urlPost}?accion=obtenerTablasSyncMovil`, {
       headers:
         new HttpHeaders(
           {
@@ -105,12 +107,26 @@ export class Sync {
             mensaje = resultadoProcesoSyncTipoMuestra.mensaje;
           }
 
+          let resultadoProcesoSyncFormulario = await this.procesoSyncFormulario(db, res);
+          if (resultadoProcesoSyncFormulario.estado === 'error') {
+            resultado = 'error';
+            mensaje = resultadoProcesoSyncFormulario.mensaje;
+          }
+
+          let resultadoprocesoSyncPersonaFormularioHacienda = await this.procesoSyncPersonaFormularioHacienda(db, res);
+          if (resultadoprocesoSyncPersonaFormularioHacienda.estado === 'error') {
+            resultado = 'error';
+            mensaje = resultadoprocesoSyncPersonaFormularioHacienda.mensaje;
+          }
+
           if (resultado === 'ok') {
-            this.msgService.msgInfo(mensaje);
+            this.msgService.msgInfo('Datos sincronizados con exito');
           } else {
             this.msgService.msgError(mensaje);
           }
 
+        }).catch((err) => {
+          this.msgService.msgError(err);
         });
   }
 
@@ -213,6 +229,35 @@ export class Sync {
     return resultado;
   }
 
+  async procesoSyncFormulario(db, res) {
+    let resultado;
+    let deleteHc = 'DELETE FROM rk_hc_formulario';
+    db.executeSql(deleteHc, []);
+    let l = res['rk_hc_formulario'];
+    let p = l.map((l) => `('${l.sigla}','${l.ruta}','${l.icono}','${l.color}','${l.estado}','${l.fecha_cre}','${l.fecha_mod}',${l.id},'${l.nombre}',${l.usuario_cre_id},${l.usuario_mod_id})`).join(',');
+    await db.executeSql(`INSERT INTO rk_hc_formulario (sigla,ruta,icono,color,estado,fecha_cre,fecha_mod,id,nombre,usuario_cre_id,usuario_mod_id) VALUES ${p};`, {})
+      .then((resul) => {
+        resultado = { estado: 'ok', mensaje: resul.rowsAffected }
+      }
+      ).catch((err) => { resultado = { estado: 'error', mensaje: err } });
+    return resultado;
+  }
+
+  async procesoSyncPersonaFormularioHacienda(db, res) {
+    console.log(res);
+    let resultado;
+    let deleteHc = 'DELETE FROM rk_hc_persona_formulario_hacienda';
+    db.executeSql(deleteHc, []);
+    let l = res['rk_hc_persona_formulario_hacienda'];
+    let p = l.map((l) => `(${l.usuario_id},${l.formulario_id},${l.hacienda_id},'${l.estado}','${l.fecha_cre}','${l.fecha_mod}',${l.id},${l.usuario_cre_id},${l.usuario_mod_id})`).join(',');
+    await db.executeSql(`INSERT INTO rk_hc_persona_formulario_hacienda (usuario_id,formulario_id,hacienda_id,estado,fecha_cre,fecha_mod,id,usuario_cre_id,usuario_mod_id) VALUES ${p};`, {})
+      .then((resul) => {
+        resultado = { estado: 'ok', mensaje: resul.rowsAffected }
+      }
+      ).catch((err) => { resultado = { estado: 'error', mensaje: err } });
+    return resultado;
+  }
+
   /*procesoSync(db, tabla, key, valor) {
     let deleteTable = 'DELETE FROM ' + tabla;
     db.executeSql(deleteTable, []).then(() => {
@@ -242,7 +287,7 @@ export class Sync {
             .then(dataFiles => {
               Formulario['rk_hc_form_files'] = dataFiles;
             });
-          await this.postDataServer(Formulario, db);
+          await this.postDataServer(Formulario, db,loading);
 
         });
 
@@ -258,13 +303,13 @@ export class Sync {
 
         if (dataCab.length < 1) {
           this.msgService.loading(false, loading);
-          this.msgService.msgInfo('No tiene formularios disponibles para sincronizar con el servidor.');
+          this.msgService.msgInfo('No tiene datos para sincronizar.');
         }
 
       });
   }
 
-  async postDataServer(datos, db) {
+  async postDataServer(datos, db,loading) {
 
     const options = {
       headers:
@@ -274,7 +319,7 @@ export class Sync {
           }
         )
     };
-    this.httpClient.post(`http://200.0.73.169:189/procesos/syncHacienda?accion=guardarDatosServer`, JSON.stringify(datos), options)
+    this.httpClient.post(`${this.urlPost}?accion=guardarDatosServer`, JSON.stringify(datos), options)
       .toPromise().then(
         (res: any) => {
           console.log(res);
@@ -302,6 +347,10 @@ export class Sync {
 
             this.msgService.msgError(mensaje);
           }
+        }).catch((err) => {
+          console.log(err);
+          this.msgService.loading(false, loading);
+          this.msgService.msgError('Ha ocurrido un error en el servidor por favor intente más tarde. status:'+err.status+'; msg:'+err.statusText);
         });
 
   }

@@ -123,7 +123,8 @@ export class FormTablaRComponent implements OnInit {
   }
 
 // CODIGO PARA GRABAR SECCION SUBIDA DE IMAGENES
-  tempImages:any[]=[];
+tempImagesTabla: any[] = [];
+tempImagesCons:any[]=[];
   modoCamaraBool: boolean = true;
   modoCamara() {
     if (this.modoCamaraBool == true) {
@@ -208,7 +209,10 @@ consultarImagenes() {
              GROUP BY d.cuadrante, d.linea, d.rama`;
   this.dbQuery.consultaAll('db', sql, 'N')
     .then(item => {
-      this.tempImages = item;
+      this.tempImagesTabla = item;
+      Object.entries(item).forEach(([key, element]: any) => {
+        this.tempImagesCons['L' + element.linea + '_' + element.cuadrante+ '_' + element.rama] = element
+      })
     });
 
 /*})/*.catch(e => {

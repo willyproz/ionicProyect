@@ -180,6 +180,9 @@
                     <p class="text-center p5 no-margin ">
                       <ion-button expand="full" color="warning" (click)="camara((iml+1)+'_C'+(hc+1)+'_R'+(hrt+1),tipo,'R')">
                         <ion-icon name="camera-sharp"></ion-icon>
+                        <ion-badge *ngIf="tempImagesCons['L'+(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)]?.cnt > 0" color="tertiary" type="ios">
+                          {{tempImagesCons['L'+(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)].cnt}}
+                        </ion-badge>
                       </ion-button>
                     </p>
                 </td>
@@ -209,7 +212,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let data of tempImages">
+      <tr *ngFor="let data of tempImagesTabla">
         <td>{{data.formulario_id}}</td>
         <td>{{data.linea}}</td>
         <td>{{data.cuadrante}}</td>
