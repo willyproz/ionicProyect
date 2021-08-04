@@ -1,8 +1,8 @@
 {
   "name": "componentes",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "author": "Ionic Framework",
-  "homepage": "http://app.durexporta.com/",
+  "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
