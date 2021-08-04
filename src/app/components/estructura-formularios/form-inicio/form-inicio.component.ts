@@ -64,7 +64,7 @@ export class FormInicioComponent implements OnInit {
     this.dbQuery.consultaAll('db', sqlHacienda, 'A')
       .then(item => {
         this.SelectHacienda = item;
-       
+
       }).catch(e => {
         this.msg.msgError(e);
       //  localStorage.clear();
@@ -90,7 +90,7 @@ export class FormInicioComponent implements OnInit {
     modulo_id: [''],
     tipo_muestra_id: ['']
   });
-   
+
   }
 
   Formulario: FormGroup = this.formBuilder.group({
@@ -106,7 +106,7 @@ export class FormInicioComponent implements OnInit {
   // console.log($event.detail.value);
   let id = $event.target.value > 0 ? $event.target.value : 0;
   if(id > 0){
-   
+
   //  console.log(id);
     let sql = `SELECT id as codigo, lote as descripcion FROM rk_hc_lote WHERE hacienda_id = ${id} and estado = ? `;
    this.dbQuery.consultaAll('db',sql, 'A')
@@ -120,7 +120,7 @@ export class FormInicioComponent implements OnInit {
    });;
   // console.log($event.target.value);
    }
-  
+
  }
 
  onChangeModulo($event){
@@ -138,8 +138,8 @@ export class FormInicioComponent implements OnInit {
       });;
       //console.log($event.target.value);
     }
-   
- 
+
+
 }
 
   consultarTabla() {

@@ -21,13 +21,13 @@ export class LoginPage implements OnInit {
     private Dbservices: DbService,
     private db: Sync
   ) {
-    this.syncronize();
+    //this.syncronize();
   }
 
   ngOnInit() { }
 
   ionViewWillEnter() {
-    this.syncronize();
+  //  this.syncronize();
     this.Formulario.reset();
   }
 
