@@ -17,8 +17,8 @@ export class LoginPage implements OnInit {
   constructor(private fb: FormBuilder,
     private router: Router,
     private msg: MsgTemplateService,
-    private dbquery: DbQuery,
     private Dbservices: DbService,
+    private dbquery: DbQuery,
     private db: Sync
   ) {
     //this.syncronize();
