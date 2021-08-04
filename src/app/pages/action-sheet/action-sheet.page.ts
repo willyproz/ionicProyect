@@ -69,9 +69,17 @@ export class ActionSheetPage implements OnInit {
               }
               var el = document.getElementById('ma' + this.cnt)!;
               el.classList.remove("hidden");
+            }else{
+              this.cnt = 0;
+              var inactivos = document.getElementsByClassName("fma");
+              for (var i = 0; i < inactivos.length; i++) {
+                inactivos[i].classList.add("hidden");
+              }
+              var el = document.getElementById('ma' + 0)!;
+              el.classList.remove("hidden");
             }
           }else{
-            this.Msg.toastMsg('usted no tiene un formulario activo','error');
+            this.Msg.toastMsg('Usted no tiene un formulario activo.','error');
           }
 
         });

@@ -14,7 +14,7 @@
       <ion-item>
         <ion-label>Hacienda</ion-label>
         <ion-select formControlName="hacienda_id" *ngIf="FormularioCab.length < 1 ; else haciendatag"
-          placeholder="Seleccionar Hacienda" interface="action-sheet">
+          placeholder="Seleccionar Hacienda" interface="action-sheet" (ionChange)="onChangeLote($event)">
           <ion-select-option *ngFor="let value of SelectHacienda" value="{{ value.codigo }}">{{ value.descripcion }}
           </ion-select-option>
         </ion-select>
@@ -32,13 +32,13 @@
     <ion-col class="ion-align-self-start">
       <ion-item>
         <ion-label>Lote</ion-label>
-        <ion-select formControlName="lote_id" *ngIf="FormularioCab.length < 1 ; else lotetag"
-          placeholder="Seleccionar lote" interface="action-sheet">
+        <ion-select [disabled]="SelectLote.length < 1" formControlName="lote_id" *ngIf="FormularioCab.length < 1 ; else lotetag"
+          placeholder="Seleccionar lote" interface="action-sheet" (ionChange)="onChangeModulo($event)">
           <ion-select-option *ngFor="let value of SelectLote" value="{{ value.codigo }}">{{ value.descripcion }}
           </ion-select-option>
         </ion-select>
         <ng-template #lotetag>
-          <ion-select [disabled]=true ngModel="{{FormularioCab[0].lote}}" formControlName="lote_id"
+          <ion-select [disabled]=true ngModel="{{FormularioCab[0].lote_id}}" formControlName="lote_id"
             placeholder="Seleccionar lote" interface="action-sheet">
             <ion-select-option *ngFor="let value of SelectLote" value="{{ value.codigo }}">{{ value.descripcion }}
             </ion-select-option>
@@ -49,13 +49,13 @@
     <ion-col class="ion-align-self-center">
       <ion-item>
         <ion-label>Modulo</ion-label>
-        <ion-select formControlName="modulo_id" *ngIf="FormularioCab.length < 1 ; else modulotag"
+        <ion-select [disabled]="SelectModulo.length < 1" formControlName="modulo_id" *ngIf="FormularioCab.length < 1 ; else modulotag"
           placeholder="Seleccionar modulo" interface="action-sheet">
           <ion-select-option *ngFor="let value of SelectModulo" value="{{ value.codigo }}">{{ value.descripcion }}
           </ion-select-option>
         </ion-select>
         <ng-template #modulotag>
-          <ion-select [disabled]=true ngModel="{{FormularioCab[0].modulo}}" formControlName="modulo_id"
+          <ion-select [disabled]=true ngModel="{{FormularioCab[0].modulo_id}}" formControlName="modulo_id"
             interface="action-sheet">
             <ion-select-option *ngFor="let value of SelectModulo" value="{{ value.codigo }}">{{ value.descripcion }}
             </ion-select-option>
@@ -82,7 +82,7 @@
   </ion-row>
   <ion-row>
     <ion-col>
-      <ion-button *ngIf="FormularioCab.length < 1 ; else liquidartag" type="submit" size="large" color="tertiary"
+      <ion-button *ngIf="TablaFormularioCab.length < 1 ; else liquidartag" type="submit" size="large" color="tertiary"
         expand="block">
         <ion-icon name="checkmark-outline"></ion-icon>
         Grabar

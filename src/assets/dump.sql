@@ -39,10 +39,25 @@ CREATE TABLE IF NOT EXISTS rk_hc_empresa(
     fecha_mod DATETIME
 );
 
-CREATE TABLE IF NOT EXISTS rk_hc_persona_formulario(
+CREATE TABLE IF NOT EXISTS rk_hc_persona_formulario_hacienda(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     usuario_id INTEGER,
     formulario_id INTEGER,
+    hacienda_id INTEGER,
+    estado CHAR(1) DEFAULT 'A',
+    usuario_cre_id INTEGER,
+    fecha_cre DATETIME,
+    usuario_mod_id INTEGER,
+    fecha_mod DATETIME
+);
+
+CREATE TABLE IF NOT EXISTS rk_hc_formulario(
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    nombre VARCHAR(100),
+    sigla VARCHAR(30),
+    ruta VARCHAR(100),
+    icono VARCHAR(100),
+    color VARCHAR(100),
     estado CHAR(1) DEFAULT 'A',
     usuario_cre_id INTEGER,
     fecha_cre DATETIME,
@@ -129,8 +144,8 @@ CREATE TABLE IF NOT EXISTS rk_hc_tipo_muestra(
 CREATE TABLE IF NOT EXISTS rk_hc_form_cab(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     hacienda_id INTEGER,
-    lote VARCHAR(10),
-    modulo VARCHAR(10),
+    lote_id INTEGER,
+    modulo_id INTEGER,
     empresa_id INTEGER,
     tipo_muestra_id INTEGER,
     observacion TEXT,
