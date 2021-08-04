@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Platform } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
 import { MsgTemplateService } from '../utilitarios/msg-template.service';
 import { DbQuery } from './dbQuerys.service';
 import { MyUserService } from '../utilitarios/myUser.service';
-
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -15,13 +13,14 @@ import { MyUserService } from '../utilitarios/myUser.service';
 export class Sync {
   public storage: SQLiteObject;
   public respuestaSync: any = '';
-  constructor(private platform: Platform,
+  constructor(
     private dbQuery: DbQuery,
     private sqlite: SQLite,
     private msgService: MsgTemplateService,
     private httpClient: HttpClient,
-    private sqlPorter: SQLitePorter,
-    private MyUser: MyUserService) {
+    private MyUser: MyUserService,
+    private router:Router
+    ) {
 
   }
   //ruta principal para sincronizar de 2 vias: dispositivo al server y server al dispositivo
@@ -34,7 +33,10 @@ export class Sync {
     })
       .then((db: SQLiteObject) => {
         return db;
-      })
+      }).catch(()=>{
+        localStorage.clear();
+        this.router.navigate(['/login']);
+      });
     //.catch(e => console.log(e));
   }
 

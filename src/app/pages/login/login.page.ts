@@ -6,6 +6,7 @@ import { DbQuery } from 'src/app/services/model/dbQuerys.service';
 import { Sync } from 'src/app/services/model/sync.service';
 import { MsgTemplateService } from 'src/app/services/utilitarios/msg-template.service';
 import { Md5 } from 'ts-md5/dist/md5';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -45,10 +46,8 @@ export class LoginPage implements OnInit {
       }
       let clave = Md5.hashStr(password);
       let sql = 'SELECT COUNT(*) as cnt, nombre,id FROM rk_hc_usuario WHERE correo = "' + email + '"  and clave = "' + clave + '"'
-      await this.dbquery.openOrCreateDB().then((db) => {
-        this.dbquery.consultaLogin(db, sql)
+        this.dbquery.consultaLogin('db', sql)
           .then(async (res) => {
-            //  console.log(res[0].cnt);
             if (res[0].cnt === 1) {
               let emailCodec = Md5.hashStr(email);
               let token = emailCodec + clave;
@@ -61,8 +60,10 @@ export class LoginPage implements OnInit {
             } else {
               this.msg.msgError('Usuario o Contraseña incorrectos.');
             }
+          }).catch(e => {
+            localStorage.clear();
+            this.router.navigate(['/login'])
           });
-      });
     } else {
       this.msg.msgError('Debe completar los campos del login.');
     }

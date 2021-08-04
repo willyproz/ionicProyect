@@ -38,10 +38,9 @@
           </ion-select-option>
         </ion-select>
         <ng-template #lotetag>
-          <ion-select [disabled]=true ngModel="{{FormularioCab[0].lote_id}}" formControlName="lote_id"
+          <ion-select [disabled]=true ngModel="{{FormularioCab[0].lote}}" formControlName="lote_id"
             placeholder="Seleccionar lote" interface="action-sheet">
-            <ion-select-option *ngFor="let value of SelectLote" value="{{ value.codigo }}">{{ value.descripcion }}
-            </ion-select-option>
+            <ion-select-option>{{ FormularioCab[0].lote }}</ion-select-option>
           </ion-select>
         </ng-template>
       </ion-item>
@@ -55,10 +54,9 @@
           </ion-select-option>
         </ion-select>
         <ng-template #modulotag>
-          <ion-select [disabled]=true ngModel="{{FormularioCab[0].modulo_id}}" formControlName="modulo_id"
+          <ion-select [disabled]=true ngModel="{{ FormularioCab[0].modulo }}" formControlName="modulo_id"
             interface="action-sheet">
-            <ion-select-option *ngFor="let value of SelectModulo" value="{{ value.codigo }}">{{ value.descripcion }}
-            </ion-select-option>
+            <ion-select-option>{{ FormularioCab[0].modulo }} </ion-select-option>
           </ion-select>
         </ng-template>
       </ion-item>
