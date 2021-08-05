@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
+import { Platform } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
 import { MsgTemplateService } from '../utilitarios/msg-template.service';
 import { DbQuery } from './dbQuerys.service';
 import { MyUserService } from '../utilitarios/myUser.service';
 import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +16,11 @@ import { Router } from '@angular/router';
 export class Sync {
   public storage: SQLiteObject;
   public respuestaSync: any = '';
+  private isDbReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  db: any;
   constructor(
+    private platform: Platform,
+    private sqlPorter: SQLitePorter,
     private dbQuery: DbQuery,
     private sqlite: SQLite,
     private msgService: MsgTemplateService,
@@ -21,28 +28,57 @@ export class Sync {
     private MyUser: MyUserService,
     private router:Router
     ) {
-
+      this.platform.ready().then(() => {
+        this.sqlite.create({
+          name: 'positronx_db.db',
+          location: 'default'
+        })
+          .then((db: SQLiteObject) => {
+            this.db = db;
+            this.getFakeData();
+          }).catch(() => {
+            localStorage.clear();
+            this.router.navigate(['/login']);
+          });
+      });
   }
   //ruta principal para sincronizar de 2 vias: dispositivo al server y server al dispositivo
   urlPost = 'http://200.0.73.169:189/procesos/syncHacienda';
 
+  dbState() { return this.isDbReady.asObservable(); }
+
+
+  // Render fake data
+  getFakeData() {
+    this.httpClient.get(
+      'assets/dump.sql',
+      { responseType: 'text' }
+    ).subscribe(data => {
+      this.sqlPorter.importSqlToDb(this.db, data)
+        .then(_ => {
+          console.log('TablasCreadas');
+          //  this.openOrCreateDB();
+          this.isDbReady.next(true);
+        })
+        .catch(error => console.error(error));
+    });
+  }
+
   openOrCreateDB() {
-    return this.sqlite.create({
+    this.sqlite.create({
       name: 'positronx_db.db',
       location: 'default'
+    })?.then((db: SQLiteObject) => {
+      this.db = db;
+    }).catch((e) => {
+      localStorage.clear();
+      this.router.navigate(['/login']);
     })
-      .then((db: SQLiteObject) => {
-        return db;
-      }).catch(()=>{
-        localStorage.clear();
-        this.router.navigate(['/login']);
-      });
-    //.catch(e => console.log(e));
   }
 
 
   /* Sincronizar datos con el movil*/
-  async syncData(db) {
+  async syncData() {
     const options = {
       headers:
         new HttpHeaders(
@@ -67,55 +103,55 @@ export class Sync {
           let resultado = 'ok';
           let mensaje = 'Datos sincronizados con exito';
 
-          let resultadoProcesoSyncHacienda = await this.procesoSyncHacienda(db, res);
+          let resultadoProcesoSyncHacienda = await this.procesoSyncHacienda(this.db, res);
           if (resultadoProcesoSyncHacienda.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncHacienda.mensaje;
           }
 
-          let resultadoProcesoSyncUsuario = await this.procesoSyncUsuario(db, res);
+          let resultadoProcesoSyncUsuario = await this.procesoSyncUsuario(this.db, res);
           if (resultadoProcesoSyncUsuario.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncUsuario.mensaje;
           }
 
-          let resultadoProcesoSyncLote = await this.procesoSyncLote(db, res);
+          let resultadoProcesoSyncLote = await this.procesoSyncLote(this.db, res);
           if (resultadoProcesoSyncLote.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncLote.mensaje;
           }
 
-          let resultadoProcesoSyncLoteDet = await this.procesoSyncLoteDet(db, res);
+          let resultadoProcesoSyncLoteDet = await this.procesoSyncLoteDet(this.db, res);
           if (resultadoProcesoSyncLoteDet.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncLoteDet.mensaje;
           }
 
-          let resultadoProcesoSyncFomularioCab = await this.procesoSyncFomularioCab(db, res);
+          let resultadoProcesoSyncFomularioCab = await this.procesoSyncFomularioCab(this.db, res);
           if (resultadoProcesoSyncFomularioCab.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncFomularioCab.mensaje;
           }
 
-          let resultadoProcesoSyncFomularioDet = await this.procesoSyncFomularioDet(db, res);
+          let resultadoProcesoSyncFomularioDet = await this.procesoSyncFomularioDet(this.db, res);
           if (resultadoProcesoSyncFomularioDet.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncFomularioDet.mensaje;
           }
 
-          let resultadoProcesoSyncTipoMuestra = await this.procesoSyncTipoMuestra(db, res);
+          let resultadoProcesoSyncTipoMuestra = await this.procesoSyncTipoMuestra(this.db, res);
           if (resultadoProcesoSyncTipoMuestra.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncTipoMuestra.mensaje;
           }
 
-          let resultadoProcesoSyncFormulario = await this.procesoSyncFormulario(db, res);
+          let resultadoProcesoSyncFormulario = await this.procesoSyncFormulario(this.db, res);
           if (resultadoProcesoSyncFormulario.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoProcesoSyncFormulario.mensaje;
           }
 
-          let resultadoprocesoSyncPersonaFormularioHacienda = await this.procesoSyncPersonaFormularioHacienda(db, res);
+          let resultadoprocesoSyncPersonaFormularioHacienda = await this.procesoSyncPersonaFormularioHacienda(this.db, res);
           if (resultadoprocesoSyncPersonaFormularioHacienda.estado === 'error') {
             resultado = 'error';
             mensaje = resultadoprocesoSyncPersonaFormularioHacienda.mensaje;
@@ -128,7 +164,7 @@ export class Sync {
           }
 
         }).catch((err) => {
-          this.msgService.msgError(err);
+          this.msgService.msgError(err.message);
         });
   }
 
@@ -274,34 +310,39 @@ export class Sync {
   conteoLoadingEnd: number = 0;
   syncDataServer(db) {
     var Formulario: any = {}
-    this.dbQuery.consultaAll(db, `SELECT * FROM rk_hc_form_cab WHERE liquidado ='S' and sincronizado = ?`, 'N')
+    this.dbQuery.consultaAll('db', `SELECT * FROM rk_hc_form_cab WHERE liquidado ='S' and sincronizado = ?`, 'N')
       .then(async dataCab => {
+        console.log('dataCab');
+        console.log(dataCab);
         let loading = await this.msgService.loadingCreate('Sincronizando datos por favor espere...');
         this.msgService.loading(true, loading);
-        await Object.entries(dataCab).forEach(async ([key, element]: any) => {
+        Object.entries(dataCab).forEach(async ([key, element]: any) => {
           Formulario['rk_hc_form_cab'] = element;
+       
           // await this.postDataServer(element);
-          await this.dbQuery.consultaAll(db, `SELECT * FROM rk_hc_form_det WHERE formulario_id = ${element.id} and sincronizado = ?`, 'N')
+          await this.dbQuery.consultaAll('db', `SELECT * FROM rk_hc_form_det WHERE formulario_id = ${element.id} and sincronizado = ?`, 'N')
             .then(dataDet => {
               Formulario['rk_hc_form_det'] = dataDet;
             });
-          await this.dbQuery.consultaAll(db, `SELECT * FROM rk_hc_form_files WHERE formulario_id = ${element.id} and sincronizado = ?`, 'N')
+          await this.dbQuery.consultaAll('db', `SELECT * FROM rk_hc_form_files WHERE formulario_id = ${element.id} and sincronizado = ?`, 'N')
             .then(dataFiles => {
               Formulario['rk_hc_form_files'] = dataFiles;
             });
-          await this.postDataServer(Formulario, db,loading);
-
+         await this.postDataServer(Formulario, this.db,loading);
+         console.log('Formulario');
+         console.log(Formulario);
+         console.log(element);
         });
 
-        var timerInterval = setInterval(() => {
+      /*  var timerInterval = setInterval(() => {
           /*console.log(this.conteo);
           console.log(dataCab.length);*/
-          if (this.conteoLoadingEnd === dataCab.length) {
+      /*    if (this.conteoLoadingEnd === dataCab.length) {
             this.msgService.loading(false, loading);
             this.conteoLoadingEnd = 0;
             clearInterval(timerInterval);
           }
-        }, 100);
+        }, 100);*/
 
         if (dataCab.length < 1) {
           this.msgService.loading(false, loading);
@@ -311,7 +352,7 @@ export class Sync {
       });
   }
 
-  async postDataServer(datos, db,loading) {
+ async postDataServer(datos, db,loading) {
 
     const options = {
       headers:
@@ -321,7 +362,7 @@ export class Sync {
           }
         )
     };
-    this.httpClient.post(`${this.urlPost}?accion=guardarDatosServer`, JSON.stringify(datos), options)
+   return await this.httpClient.post(`${this.urlPost}?accion=guardarDatosServer`, JSON.stringify(datos), options)
       .toPromise().then(
         (res: any) => {
           console.log(res);
@@ -346,7 +387,6 @@ export class Sync {
             this.conteoLoadingEnd++;
             this.msgService.msgInfo(mensaje);
           } else {
-
             this.msgService.msgError(mensaje);
           }
         }).catch((err) => {

@@ -25,7 +25,9 @@ export class LoginPage implements OnInit {
     //this.syncronize();
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.syncronize();
+   }
 
   ionViewWillEnter() {
   //  this.syncronize();
@@ -79,11 +81,12 @@ export class LoginPage implements OnInit {
   async syncronize() {
     let loading = await this.msg.loadingCreate('Sincronizando datos por favor espere...');
     this.msg.loading(true, loading)
-    this.db.openOrCreateDB().then(res => {
-      this.db.syncData(res).then(() => {
-        this.msg.loading(false, loading)
+      this.db.syncData().then(() => {
+        this.msg.loading(false, loading);
+      }).catch(()=>{
+        this.msg.msgError('Por favor intente sincronizar más tarde.');
       });
-    });
+    
   }
 
 

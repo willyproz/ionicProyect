@@ -18,7 +18,9 @@ export class FormInicioComponent implements OnInit {
   @Input() tituloTabla: string = '';
   @Input() set tipo_form(_data: any) {
     this.tipo_formulario = _data;
-    this.llenarSelects();
+    if(this.TablaFormularioCab.length < 1){
+      this.llenarSelects();
+    }
     this.consultarTabla();
   };
 
@@ -105,6 +107,8 @@ export class FormInicioComponent implements OnInit {
         let sql = `SELECT id as codigo, lote as descripcion FROM rk_hc_lote WHERE hacienda_id = ${id} and estado = ? `;
         this.dbQuery.consultaAll('db', sql, 'A')
           .then(item => {
+            this.Formulario.patchValue({lote_id:'',modulo_id:''});
+            this.SelectModulo= [];
             this.SelectLote = item;
           }).catch(e => {
             console.log('loteCons' + e.message);
@@ -132,22 +136,24 @@ export class FormInicioComponent implements OnInit {
   }
 
   consultarTabla() {
-    let sql = `SELECT rc.hacienda_id, rl.lote,rld.modulo,rc.tipo_muestra_id FROM rk_hc_form_cab rc
+    let sql = `SELECT rh.nombre as hacienda, rl.lote,rld.modulo,rtm.nombre as tipo_muestra FROM rk_hc_form_cab rc
               LEFT JOIN  rk_hc_lote rl on rl.id = rc.lote_id
               LEFT JOIN  rk_hc_lote_det rld on rld.id = rc.modulo_id
+              LEFT JOIN  rk_hc_tipo_muestra rtm on rtm.id = rc.tipo_muestra_id
+              LEFT JOIN  rk_hc_hacienda rh on rh.id = rc.hacienda_id
               WHERE rc.tipo_form = '${this.tipo_formulario}'
               and rc.usuario_cre_id = ${localStorage.getItem('id_usuario')}
               and rc.liquidado = ?`;
     this.dbQuery.consultaAll('db', sql, 'N')
       .then(item => {
         this.FormularioCab = item;
-        console.log(this.FormularioCab);
+        //console.log(this.FormularioCab);
       }).catch(e => {
         console.log('query formularioCab' + e.message);
         this.msg.msgError(e);
       });
 
-    let sql1 = `SELECT ca.tipo_form, ca.id, rhh.nombre as hacienda, ca.lote_id,ca.modulo_id, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.tipo_form = '${this.tipo_formulario}' and ca.liquidado = ?`;
+    let sql1 = `SELECT ca.tipo_form, ca.id, rhh.nombre as hacienda, ca.lote_id,ca.modulo_id, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.tipo_form = '${this.tipo_formulario}' and ca.usuario_cre_id = ${localStorage.getItem('id_usuario')} and ca.liquidado = ?`;
     this.dbQuery.consultaAll('db', sql1, 'N')
       .then(item => {
         this.TablaFormularioCab = item;

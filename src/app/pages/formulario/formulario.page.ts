@@ -70,12 +70,8 @@ export class FormularioPage {
   async syncronize() {
     let loading = await this.msgService.loadingCreate('Sincronizando datos por favor espere...');
     this.msgService.loading(true, loading)
-    this.db.openOrCreateDB().then(res => {
-      this.db.syncData(res).then(() => {
-
-        //console.log(r);
+      this.db.syncData().then(() => {
         this.msgService.loading(false, loading)
       });
-    });
   }
 }
