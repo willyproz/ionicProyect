@@ -20,54 +20,50 @@ export class ConsultaPage implements OnInit {
   DataTipoMuestra: any[] = [];
   //consultaAll
   ngOnInit() {
-    this.dbQuery.openOrCreateDB().then(db => {
-      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_hacienda WHERE estado = ?', 'A')
-        .then(item => {
-          this.DataHacienda = item;
-        });
+    this.dbQuery.consultaAll('db', 'SELECT * FROM rk_hc_hacienda WHERE estado = ?', 'A')
+      .then(item => {
+        this.DataHacienda = item;
+      });
 
 
-      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_usuario WHERE estado = ?', 'A')
-        .then(item => {
+    this.dbQuery.consultaAll('db', 'SELECT * FROM rk_hc_usuario WHERE estado = ?', 'A')
+      .then(item => {
         //  console.log(item);
-          this.DataUsuario = item;
-        });
+        this.DataUsuario = item;
+      });
 
 
-      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_lote WHERE estado = ?', 'A')
-        .then(item => {
-          //console.log(item);
-          this.DataLote = item;
-        });
+    this.dbQuery.consultaAll('db', 'SELECT * FROM rk_hc_lote WHERE estado = ?', 'A')
+      .then(item => {
+        //console.log(item);
+        this.DataLote = item;
+      });
 
 
-      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_lote_det WHERE estado = ?', 'A')
-        .then(item => {
+    this.dbQuery.consultaAll('db', 'SELECT * FROM rk_hc_lote_det WHERE estado = ?', 'A')
+      .then(item => {
         //  console.log(item);
-          this.DataLoteDet = item;
-        });
+        this.DataLoteDet = item;
+      });
 
-      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_tipo_formulario_cab WHERE estado = ?', 'A')
-        .then(item => {
-       //   console.log(item);
-          this.DataTipoFormCab = item;
-        });
+    this.dbQuery.consultaAll('db', 'SELECT * FROM rk_hc_tipo_formulario_cab WHERE estado = ?', 'A')
+      .then(item => {
+        //   console.log(item);
+        this.DataTipoFormCab = item;
+      });
 
-      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_tipo_formulario_det WHERE estado = ?', 'A')
-        .then(item => {
+    this.dbQuery.consultaAll('db', 'SELECT * FROM rk_hc_tipo_formulario_det WHERE estado = ?', 'A')
+      .then(item => {
         //  console.log(item);
-          this.DataTipoFormDet = item;
-        });
+        this.DataTipoFormDet = item;
+      });
 
 
-      this.dbQuery.consultaAll(db, 'SELECT * FROM rk_hc_tipo_muestra WHERE estado = ?', 'A')
-        .then(item => {
+    this.dbQuery.consultaAll('db', 'SELECT * FROM rk_hc_tipo_muestra WHERE estado = ?', 'A')
+      .then(item => {
         //  console.log(item);
-          this.DataTipoMuestra = item;
-        });
-
-    })
-
+        this.DataTipoMuestra = item;
+      });
   }
 
 }

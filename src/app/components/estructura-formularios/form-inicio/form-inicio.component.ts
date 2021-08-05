@@ -18,7 +18,9 @@ export class FormInicioComponent implements OnInit {
   @Input() tituloTabla: string = '';
   @Input() set tipo_form(_data: any) {
     this.tipo_formulario = _data;
-    this.llenarSelects();
+    if(this.TablaFormularioCab.length < 1){
+      this.llenarSelects();
+    }
     this.consultarTabla();
   };
 
@@ -39,7 +41,7 @@ export class FormInicioComponent implements OnInit {
 
 
   ionViewWillEnter() {
-    //this.consultarTabla();
+    this.consultarTabla();
   }
 
   SelectHacienda: any[] = [];
@@ -67,8 +69,6 @@ export class FormInicioComponent implements OnInit {
 
       }).catch(e => {
         this.msg.msgError(e);
-      //  localStorage.clear();
-      //  this.router.navigate(['/login'])
       });
 
     this.dbQuery.consultaAll('db', 'SELECT id as codigo, nombre as descripcion FROM rk_hc_tipo_muestra WHERE estado = ?', 'A')
@@ -76,20 +76,18 @@ export class FormInicioComponent implements OnInit {
         this.SelectTipoMuestra = item;
       }).catch(e => {
         this.msg.msgError(e);
-        //localStorage.clear();
-        //this.router.navigate(['/login'])
       });
   }
 
   ngOnInit() {
-   // this.consultarTabla();
-   this.Formulario = this.formBuilder.group({
-    responsable_id: [''],
-    hacienda_id: [''],
-    lote_id: [''],
-    modulo_id: [''],
-    tipo_muestra_id: ['']
-  });
+    // this.consultarTabla();
+    this.Formulario = this.formBuilder.group({
+      responsable_id: [''],
+      hacienda_id: [''],
+      lote_id: [''],
+      modulo_id: [''],
+      tipo_muestra_id: ['']
+    });
 
   }
 
@@ -101,80 +99,72 @@ export class FormInicioComponent implements OnInit {
     tipo_muestra_id: ['']
   });
 
- onChangeLote($event){
-  // console.log($event);
-  // console.log($event.detail.value);
-  let id = $event.target.value > 0 ? $event.target.value : 0;
-  if(id > 0){
+  onChangeLote($event) {
+    if (this.FormularioCab.length < 2) {
+      let id = $event.target.value > 0 ? $event.target.value : 0;
+      if (id > 0) {
 
-  //  console.log(id);
-    let sql = `SELECT id as codigo, lote as descripcion FROM rk_hc_lote WHERE hacienda_id = ${id} and estado = ? `;
-   this.dbQuery.consultaAll('db',sql, 'A')
-   .then(item => {
-     this.SelectLote = item;
-   }).catch(e => {
-     console.log('loteCons'+e.message);
-     this.msg.msgError(e);
-     //localStorage.clear();
-    // this.router.navigate(['/login'])
-   });;
-  // console.log($event.target.value);
-   }
-
- }
-
- onChangeModulo($event){
-    let id = $event.target.value > 0 ? $event.target.value : 0;
-    if(id > 0){
-      let sql = `SELECT id as codigo, modulo as descripcion FROM rk_hc_lote_det WHERE lote_id = ${id} and estado = ? `;
-      this.dbQuery.consultaAll('db',sql, 'A')
-      .then(item => {
-        this.SelectModulo = item;
-      }).catch(e => {
-       console.log('moduloCons'+e.message);
-       this.msg.msgError(e);
-       // localStorage.clear();
-      //  this.router.navigate(['/login'])
-      });;
-      //console.log($event.target.value);
+        let sql = `SELECT id as codigo, lote as descripcion FROM rk_hc_lote WHERE hacienda_id = ${id} and estado = ? `;
+        this.dbQuery.consultaAll('db', sql, 'A')
+          .then(item => {
+            this.Formulario.patchValue({lote_id:'',modulo_id:''});
+            this.SelectModulo= [];
+            this.SelectLote = item;
+          }).catch(e => {
+            console.log('loteCons' + e.message);
+            this.msg.msgError(e);
+          });;
+      }
     }
+  }
 
-
-}
+  onChangeModulo($event) {
+      let id = $event.target.value > 0 ? $event.target.value : 0;
+      if (id > 0) {
+        let sql = `SELECT id as codigo, modulo as descripcion FROM rk_hc_lote_det WHERE lote_id = ${id} and estado = ? `;
+        this.dbQuery.consultaAll('db', sql, 'A')
+          .then(item => {
+            this.SelectModulo = item;
+            console.log(this.SelectModulo);
+          }).catch(e => {
+            console.log('moduloCons' + e.message);
+            this.msg.msgError(e);
+          });
+      }
+  }
 
   consultarTabla() {
-    /*this.dbQuery.openOrCreateDB().then(db => {*/
-    let sql = `SELECT * FROM rk_hc_form_cab WHERE tipo_form = '${this.tipo_formulario}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and liquidado = ?`;
+    let sql = `SELECT rh.nombre as hacienda, rl.lote,rld.modulo,rtm.nombre as tipo_muestra FROM rk_hc_form_cab rc
+              LEFT JOIN  rk_hc_lote rl on rl.id = rc.lote_id
+              LEFT JOIN  rk_hc_lote_det rld on rld.id = rc.modulo_id
+              LEFT JOIN  rk_hc_tipo_muestra rtm on rtm.id = rc.tipo_muestra_id
+              LEFT JOIN  rk_hc_hacienda rh on rh.id = rc.hacienda_id
+              WHERE rc.tipo_form = '${this.tipo_formulario}'
+              and rc.usuario_cre_id = ${localStorage.getItem('id_usuario')}
+              and rc.liquidado = ?`;
     this.dbQuery.consultaAll('db', sql, 'N')
       .then(item => {
         this.FormularioCab = item;
+        //console.log(this.FormularioCab);
       }).catch(e => {
-        console.log('query formularioCab'+e.message);
+        console.log('query formularioCab' + e.message);
         this.msg.msgError(e);
-      //  localStorage.clear();
-     //   this.router.navigate(['/login'])
       });
-    /*});*/
 
-    /*this.dbQuery.openOrCreateDB().then(db => {*/
-    let sql1 = `SELECT ca.tipo_form, ca.id, rhh.nombre as hacienda, ca.lote_id,ca.modulo_id, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.tipo_form = '${this.tipo_formulario}' and ca.liquidado = ?`;
+    let sql1 = `SELECT ca.tipo_form, ca.id, rhh.nombre as hacienda, ca.lote_id,ca.modulo_id, tm.nombre as tipo_muestra , ca.estado,rhu.nombre as usuario_cre, ca.fecha_cre, ca.liquidado FROM rk_hc_form_cab ca LEFT JOIN rk_hc_hacienda rhh on rhh.id = ca.hacienda_id LEFT JOIN rk_hc_tipo_muestra tm on tm.id = ca.tipo_muestra_id LEFT JOIN rk_hc_usuario rhu on rhu.id = ca.usuario_cre_id WHERE ca.tipo_form = '${this.tipo_formulario}' and ca.usuario_cre_id = ${localStorage.getItem('id_usuario')} and ca.liquidado = ?`;
     this.dbQuery.consultaAll('db', sql1, 'N')
       .then(item => {
         this.TablaFormularioCab = item;
       }).catch(e => {
-        console.log('query tablaCab'+e.message);
+        console.log('query tablaCab' + e.message);
         this.msg.msgError(e);
-      //  localStorage.clear();
-       // this.router.navigate(['/login'])
       });
-    /* });*/
   }
 
   validarFormulario(formulario) {
     let formValid = true;
     let mensaje = '<ul>';
     if (formulario.value.hacienda_id.length > 0 && formulario.value.hacienda_id > 0) {
-      console.log(formulario.value.hacienda_id);
 
     } else {
       formValid = false;
@@ -202,15 +192,11 @@ export class FormInicioComponent implements OnInit {
   }
 
   insertarFormulario() {
-   // console.log(this.Formulario.value);
     let formValid = this.validarFormulario(this.Formulario);
     if (formValid.estado === true) {
-      //console.log(this.Formulario.valid);
-      /*this.dbQuery.openOrCreateDB().then(db => {*/
       let sql = `SELECT count(*) as cnt FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_formulario}' and liquidado = ? `;
       this.dbQuery.consultaAll('db', sql, 'N')
         .then(resp => {
-          //console.log(resp);
           if (resp[0].cnt < 1) {
 
             this.msg.msgConfirmar().then((result) => {
@@ -239,9 +225,7 @@ export class FormInicioComponent implements OnInit {
                       }
                       this.dbQuery.respuesta = {};
                     });
-                  /*});*/
                 } else if (result.isDenied) {
-                  //  this.msg.msgInfo('Formulario no guardado');
                   this.msg.toastMsg('Formulario no guardado.', 'info');
                 }
               }
@@ -250,38 +234,29 @@ export class FormInicioComponent implements OnInit {
             this.msg.toastMsg('No puede crear un nuevo formulario mientras su usuario tenga un formulario activo!', 'error');
           }
         }).catch(e => {
-          console.log('insert'+e.message);
           this.msg.msgError(e);
-         // localStorage.clear();
-          // this.router.navigate(['/login'])
         });
     } else {
       this.msg.msgError(formValid.mensaje);
     }
-    /*});*/
   }
 
 
 
   async liquidarFormulario() {
-    await this.dbQuery.openOrCreateDB().then(db => {
-      let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_formulario}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
-      this.dbQuery.consultaAll('db', sql, 'N').then(result => {
-        let data = [
-          'S',
-          localStorage.getItem('id_usuario'),
-          this.MyUser.dateNow()
-        ];
-        db.executeSql(`UPDATE rk_hc_form_cab SET liquidado = ?,usuario_mod_id=?,fecha_mod=? WHERE id = ${result[0].id}`, data).then(() => {
-          this.msg.toastMsg('Liquidado con exito', 'success');
-          this.router.navigate(['/inicio']);
-        }).catch(err => {
-          console.log(err);
-          this.msg.toastMsg(err, 'error');
-         // localStorage.clear();
-         // this.router.navigate(['/login'])
-        })
-      });
+    let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_formulario}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
+    this.dbQuery.consultaAll('db', sql, 'N').then(result => {
+      let data = [
+        'S',
+        localStorage.getItem('id_usuario'),
+        this.MyUser.dateNow()
+      ];
+      this.dbQuery.db.executeSql(`UPDATE rk_hc_form_cab SET liquidado = ?,usuario_mod_id=?,fecha_mod=? WHERE id = ${result[0].id}`, data).then(() => {
+        this.msg.toastMsg('Liquidado con exito', 'success');
+        this.router.navigate(['/inicio']);
+      }).catch(err => {
+        this.msg.toastMsg(err, 'error');
+      })
     });
   }
 }

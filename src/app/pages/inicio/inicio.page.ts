@@ -42,25 +42,16 @@ export class InicioPage implements OnInit {
   async syncronize() {
     let loading = await this.msg.loadingCreate('Sincronizando datos por favor espere...');
     this.msg.loading(true, loading)
-    this.sync.openOrCreateDB().then(res => {
-      this.sync.syncData(res).then(() => {
+      this.sync.syncData().then(() => {
         this.msg.loading(false, loading)
       }).catch(e => {
         localStorage.clear();
         this.router.navigate(['/login'])
       });
-    }).catch(e => {
-      localStorage.clear();
-      this.router.navigate(['/login'])
-    });
   }
 
   async syncronizeServer() {
-    //let loading = await this.msg.loadingCreate('Sincronizando datos por favor espere...');
-  //  this.msg.loading(true, loading)
-    this.sync.openOrCreateDB().then(db => {
-      this.sync.syncDataServer(db)
-    });
+      this.sync.syncDataServer(this.sync.db)
   }
 
   logout(){
