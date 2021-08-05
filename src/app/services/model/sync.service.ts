@@ -8,6 +8,9 @@ import { MyUserService } from '../utilitarios/myUser.service';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
+import { UniqueDeviceID } from '@ionic-native/unique-device-id/ngx';
+import { Uid } from '@ionic-native/uid/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 
 @Injectable({
   providedIn: 'root'
@@ -26,27 +29,74 @@ export class Sync {
     private msgService: MsgTemplateService,
     private httpClient: HttpClient,
     private MyUser: MyUserService,
-    private router:Router
-    ) {
-      this.platform.ready().then(() => {
-        this.sqlite.create({
-          name: 'positronx_db.db',
-          location: 'default'
-        })
-          .then((db: SQLiteObject) => {
-            this.db = db;
-            this.getFakeData();
-          }).catch(() => {
-            localStorage.clear();
-            this.router.navigate(['/login']);
-          });
-      });
+    private router: Router,
+    private uniqueDeviceID: UniqueDeviceID,
+    private uid: Uid,
+    private androidPermissions: AndroidPermissions
+  ) {
+    this.getPermission();
+    this.platform.ready().then(() => {
+      this.sqlite.create({
+        name: 'positronx_db.db',
+        location: 'default'
+      })
+        .then((db: SQLiteObject) => {
+          this.db = db;
+          this.getFakeData();
+        }).catch(() => {
+          localStorage.clear();
+          this.router.navigate(['/login']);
+        });
+    });
   }
   //ruta principal para sincronizar de 2 vias: dispositivo al server y server al dispositivo
   urlPost = 'http://200.0.73.169:189/procesos/syncHacienda';
 
   dbState() { return this.isDbReady.asObservable(); }
+  UniqueDeviceID:any;
+  getUniqueDeviceID() {
+    this.uniqueDeviceID.get()
+      .then((uuid: any) => {
+        console.log(uuid);
+        this.UniqueDeviceID = uuid;
+      })
+      .catch((error: any) => {
+        console.log(error);
+       this.UniqueDeviceID = "Error! ${error}";
+      });
+  }
 
+  getPermission(){
+    this.androidPermissions.checkPermission(
+      this.androidPermissions.PERMISSION.READ_PHONE_STATE
+    ).then(res => {
+      if(res.hasPermission){
+
+      }else{
+        this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.READ_PHONE_STATE).then(res => {
+          alert("Persmission Granted Please Restart App!");
+        }).catch(error => {
+          alert("Error! "+error);
+        });
+      }
+    }).catch(error => {
+      alert("Error! "+error);
+    });
+  }
+
+  getID_UID(type){
+    if(type == "IMEI"){
+      return this.uid.IMEI;
+    }else if(type == "ICCID"){
+      return this.uid.ICCID;
+    }else if(type == "IMSI"){
+      return this.uid.IMSI;
+    }else if(type == "MAC"){
+      return this.uid.MAC;
+    }else if(type == "UUID"){
+      return this.uid.UUID;
+    }
+  }
 
   // Render fake data
   getFakeData() {
@@ -309,40 +359,42 @@ export class Sync {
 
   conteoLoadingEnd: number = 0;
   syncDataServer(db) {
-    var Formulario: any = {}
+    var Formulario: any = {};
     this.dbQuery.consultaAll('db', `SELECT * FROM rk_hc_form_cab WHERE liquidado ='S' and sincronizado = ?`, 'N')
       .then(async dataCab => {
-        console.log('dataCab');
-        console.log(dataCab);
+     // console.log('dataCab');
+     // console.log(dataCab);
         let loading = await this.msgService.loadingCreate('Sincronizando datos por favor espere...');
         this.msgService.loading(true, loading);
         Object.entries(dataCab).forEach(async ([key, element]: any) => {
-          Formulario['rk_hc_form_cab'] = element;
-       
-          // await this.postDataServer(element);
+         // console.log(key);
+          Formulario['f' + key] = {};
+         // await this.postDataServer(element); 256
           await this.dbQuery.consultaAll('db', `SELECT * FROM rk_hc_form_det WHERE formulario_id = ${element.id} and sincronizado = ?`, 'N')
             .then(dataDet => {
-              Formulario['rk_hc_form_det'] = dataDet;
+              Formulario['f' + key]['rk_hc_form_det'] = dataDet;
             });
           await this.dbQuery.consultaAll('db', `SELECT * FROM rk_hc_form_files WHERE formulario_id = ${element.id} and sincronizado = ?`, 'N')
             .then(dataFiles => {
-              Formulario['rk_hc_form_files'] = dataFiles;
+              Formulario['f' + key]['rk_hc_form_files'] = dataFiles;
             });
-         await this.postDataServer(Formulario, this.db,loading);
-         console.log('Formulario');
-         console.log(Formulario);
-         console.log(element);
+          Formulario['f' + key]['rk_hc_form_cab'] = element;
+          Formulario['f' + key]['identificador'] = this.getID_UID('UUID');
+          await this.postDataServer(Formulario['f' + key], this.db, loading);
+          //console.log('Formulario');
+          //console.log(Formulario['f' + key]);
+          //console.log(element);
         });
-
-      /*  var timerInterval = setInterval(() => {
+        console.log(this.getID_UID('UUID'));
+        var timerInterval = setInterval(() => {
           /*console.log(this.conteo);
           console.log(dataCab.length);*/
-      /*    if (this.conteoLoadingEnd === dataCab.length) {
+          if (this.conteoLoadingEnd === dataCab.length) {
             this.msgService.loading(false, loading);
             this.conteoLoadingEnd = 0;
             clearInterval(timerInterval);
           }
-        }, 100);*/
+        }, 100);
 
         if (dataCab.length < 1) {
           this.msgService.loading(false, loading);
@@ -352,7 +404,7 @@ export class Sync {
       });
   }
 
- async postDataServer(datos, db,loading) {
+  async postDataServer(datos, db, loading) {
 
     const options = {
       headers:
@@ -362,7 +414,7 @@ export class Sync {
           }
         )
     };
-   return await this.httpClient.post(`${this.urlPost}?accion=guardarDatosServer`, JSON.stringify(datos), options)
+    return await this.httpClient.post(`${this.urlPost}?accion=guardarDatosServer`, JSON.stringify(datos), options)
       .toPromise().then(
         (res: any) => {
           console.log(res);
@@ -392,7 +444,7 @@ export class Sync {
         }).catch((err) => {
           console.log(err);
           this.msgService.loading(false, loading);
-          this.msgService.msgError('Ha ocurrido un error en el servidor por favor intente más tarde. status:'+err.status+'; msg:'+err.statusText);
+          this.msgService.msgError('Ha ocurrido un error en el servidor por favor intente más tarde. status:' + err.status + '; msg:' + err.statusText);
         });
 
   }
