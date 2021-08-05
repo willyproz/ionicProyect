@@ -115,6 +115,7 @@ export class FormInicioComponent implements OnInit {
   }
 
   onChangeModulo($event) {
+    if (this.FormularioCab.length < 2) {
       let id = $event.target.value > 0 ? $event.target.value : 0;
       if (id > 0) {
         let sql = `SELECT id as codigo, modulo as descripcion FROM rk_hc_lote_det WHERE lote_id = ${id} and estado = ? `;
@@ -127,6 +128,7 @@ export class FormInicioComponent implements OnInit {
             this.msg.msgError(e);
           });
       }
+    }
   }
 
   consultarTabla() {
