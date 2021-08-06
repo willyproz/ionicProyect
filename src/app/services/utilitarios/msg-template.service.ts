@@ -12,27 +12,41 @@ export class MsgTemplateService {
 
 
   msgOk(msg: string = 'Datos grabados con exito') {
-    Swal.fire(msg, '', 'success');
+   //  Swal.fire(msg, '', 'success');
+   
+   Swal.fire({
+    title: '<strong>'+msg+'</strong>',
+    icon: 'success',
+    confirmButtonText:
+      '<span style="font-size: 18px !important">OK</span>'
+  });
 
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");
   }
 
   msgInfo(msg: string = 'Datos grabados con exito') {
-    Swal.fire(msg, '', 'info');
+   //   Swal.fire(msg, '', 'info');
+
+   Swal.fire({
+    title: '<strong>'+msg+'</strong>',
+    icon: 'info',
+    confirmButtonText:
+      '<span style="font-size: 18px !important">OK</span>'
+  });
 
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");
   }
 
   msgError(msg: string) {
-    Swal.fire(msg,'', 'error');
+   //Swal.fire(msg,'', 'error');
     //confirmButtonText:     '<span style="font-size: 17px !important"><i class="fa fa-close"></i> OK :( </span>'
     Swal.fire({
       title: '<strong>'+msg+'</strong>',
       icon: 'error',
       confirmButtonText:
-        '<span style="font-size: 17px !important">ENTENDIDO :( </span>'
+        '<span style="font-size: 18px !important"><i class="fa fa-frown-o"></i> OK</span>'
     });
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");
@@ -50,9 +64,8 @@ export class MsgTemplateService {
     let msgConfirmed = Swal.fire({
       title: msg,
       showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: `Si`,
-      denyButtonText: `No`
+      confirmButtonText: `<span style="font-size: 18px !important">SI</span>`,
+      denyButtonText: `<span style="font-size: 18px !important">NO</span>`
     });
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");

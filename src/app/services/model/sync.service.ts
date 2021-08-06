@@ -8,9 +8,9 @@ import { MyUserService } from '../utilitarios/myUser.service';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
-import { UniqueDeviceID } from '@ionic-native/unique-device-id/ngx';
+/*import { UniqueDeviceID } from '@ionic-native/unique-device-id/ngx';
 import { Uid } from '@ionic-native/uid/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';*/
 
 @Injectable({
   providedIn: 'root'
@@ -29,10 +29,10 @@ export class Sync {
     private msgService: MsgTemplateService,
     private httpClient: HttpClient,
     private MyUser: MyUserService,
-    private router: Router,
-    private uniqueDeviceID: UniqueDeviceID,
+    private router: Router
+  /*  private uniqueDeviceID: UniqueDeviceID,
     private uid: Uid,
-    private androidPermissions: AndroidPermissions
+    private androidPermissions: AndroidPermissions*/
   ) {
     //this.getPermission();
     this.platform.ready().then(() => {
@@ -53,7 +53,7 @@ export class Sync {
   urlPost = 'http://app.durexporta.com/procesos/syncHacienda';
 
   dbState() { return this.isDbReady.asObservable(); }
-  UniqueDeviceID: any;
+/*  UniqueDeviceID: any;
   getUniqueDeviceID() {
     this.uniqueDeviceID.get()
       .then((uuid: any) => {
@@ -83,8 +83,8 @@ export class Sync {
       alert("Error! " + error);
     });
   }
-
-  getID_UID(type) {
+*/
+/*  getID_UID(type) {
     if (type == "IMEI") {
       return this.uid.IMEI;
     } else if (type == "ICCID") {
@@ -96,7 +96,7 @@ export class Sync {
     } else if (type == "UUID") {
       return this.uid.UUID;
     }
-  }
+  }*/
 
   // Render fake data
   getFakeData() {
@@ -365,8 +365,10 @@ export class Sync {
         // console.log('dataCab');
          console.log(dataCab);
 
-        this.msgService.loading(true, loading);
+        
         Object.entries(dataCab).forEach(async ([key, element]: any) => {
+          let loading = await this.msgService.loadingCreate('Sincronizando datos por favor espere.. '+(key+1)+'/'+dataCab.length);
+          this.msgService.loading(true, loading);
           // console.log(key);
           Formulario['f' + key] = {};
           // await this.postDataServer(element); 256
@@ -379,13 +381,13 @@ export class Sync {
               Formulario['f' + key]['rk_hc_form_files'] = dataFiles;
             });
           Formulario['f' + key]['rk_hc_form_cab'] = element;
-          Formulario['f' + key]['identificador'] = this.getID_UID('UUID');
+        //  Formulario['f' + key]['identificador'] = this.getID_UID('UUID');
           await this.postDataServer(Formulario['f' + key], this.db, loading);
           //console.log('Formulario');
           //console.log(Formulario['f' + key]);
           //console.log(element);
         });
-        console.log(this.getID_UID('UUID'));
+        //console.log(this.getID_UID('UUID'));
         var timerInterval = setInterval(() => {
           /*console.log(this.conteo);
           console.log(dataCab.length);*/

@@ -178,7 +178,7 @@
               <ng-container *ngFor="let itemHeadCuadrante of headCuadranteTable;let hc = index">
                 <td *ngFor="let itemHeadRama of headRamaTable;let hrt = index">
                     <p class="text-center p5 no-margin ">
-                      <ion-button expand="full" color="warning" (click)="camara((iml+1)+'_C'+(hc+1)+'_R'+(hrt+1),tipo,'R')">
+                      <ion-button [disabled]="!FormularioDet['L'+(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)]" expand="full" color="warning" (click)="camara((iml+1)+'_C'+(hc+1)+'_R'+(hrt+1),tipo,'R')">
                         <ion-icon name="camera-sharp"></ion-icon>
                         <ion-badge *ngIf="tempImagesCons['L'+(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)]?.cnt > 0" color="tertiary" type="ios">
                           {{tempImagesCons['L'+(iml+1)+'_C'+(hc+1)+'_R'+(hrt+1)].cnt}}

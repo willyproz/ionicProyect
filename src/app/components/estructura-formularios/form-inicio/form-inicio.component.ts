@@ -247,18 +247,26 @@ export class FormInicioComponent implements OnInit {
 
   async liquidarFormulario() {
     let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_formulario}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
-    this.dbQuery.consultaAll('db', sql, 'N').then(result => {
-      let data = [
-        'S',
-        localStorage.getItem('id_usuario'),
-        this.MyUser.dateNow()
-      ];
-      this.dbQuery.db.executeSql(`UPDATE rk_hc_form_cab SET liquidado = ?,usuario_mod_id=?,fecha_mod=? WHERE id = ${result[0].id}`, data).then(() => {
-        this.msg.toastMsg('Liquidado con exito', 'success');
-        this.router.navigate(['/inicio']);
-      }).catch(err => {
-        this.msg.toastMsg(err, 'error');
-      })
+    this.dbQuery.consultaAll('db', sql, 'N').then(res => {
+      let sql2 = `SELECT count(*) as cnt FROM rk_hc_form_det WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and formulario_id = ${res[0].id} and estado = ?`;
+      this.dbQuery.consultaAll('db', sql2, 'A').then(result => {
+        console.log(result);
+        if(result[0].cnt > 0){
+          let data = [
+            'S',
+            localStorage.getItem('id_usuario'),
+            this.MyUser.dateNow()
+          ];
+          this.dbQuery.db.executeSql(`UPDATE rk_hc_form_cab SET liquidado = ?,usuario_mod_id=?,fecha_mod=? WHERE id = ${res[0].id}`, data).then(() => {
+            this.msg.toastMsg('Liquidado con exito', 'success');
+            this.router.navigate(['/inicio']);
+          }).catch(err => {
+            this.msg.toastMsg(err, 'error');
+          })
+        }else{
+          this.msg.toastMsg('No, puede liquidar un formulario sin detalles.', 'warning');
+        }
+      });
     });
   }
 }
