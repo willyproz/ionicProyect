@@ -30,9 +30,9 @@ export class Sync {
     private httpClient: HttpClient,
     private MyUser: MyUserService,
     private router: Router
-  /*  private uniqueDeviceID: UniqueDeviceID,
-    private uid: Uid,
-    private androidPermissions: AndroidPermissions*/
+    /*  private uniqueDeviceID: UniqueDeviceID,
+      private uid: Uid,
+      private androidPermissions: AndroidPermissions*/
   ) {
     //this.getPermission();
     this.platform.ready().then(() => {
@@ -49,54 +49,55 @@ export class Sync {
         });
     });
   }
+
   //ruta principal para sincronizar de 2 vias: dispositivo al server y server al dispositivo
   urlPost = 'http://app.durexporta.com/procesos/syncHacienda';
 
   dbState() { return this.isDbReady.asObservable(); }
-/*  UniqueDeviceID: any;
-  getUniqueDeviceID() {
-    this.uniqueDeviceID.get()
-      .then((uuid: any) => {
-        console.log(uuid);
-        this.UniqueDeviceID = uuid;
-      })
-      .catch((error: any) => {
-        console.log(error);
-        this.UniqueDeviceID = "Error! ${error}";
-      });
-  }
-
-  getPermission() {
-    this.androidPermissions.checkPermission(
-      this.androidPermissions.PERMISSION.READ_PHONE_STATE
-    ).then(res => {
-      if (res.hasPermission) {
-
-      } else {
-        this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.READ_PHONE_STATE).then(res => {
-          alert("Persmission Granted Please Restart App!");
-        }).catch(error => {
-          alert("Error! " + error);
+  /*  UniqueDeviceID: any;
+    getUniqueDeviceID() {
+      this.uniqueDeviceID.get()
+        .then((uuid: any) => {
+          console.log(uuid);
+          this.UniqueDeviceID = uuid;
+        })
+        .catch((error: any) => {
+          console.log(error);
+          this.UniqueDeviceID = "Error! ${error}";
         });
-      }
-    }).catch(error => {
-      alert("Error! " + error);
-    });
-  }
-*/
-/*  getID_UID(type) {
-    if (type == "IMEI") {
-      return this.uid.IMEI;
-    } else if (type == "ICCID") {
-      return this.uid.ICCID;
-    } else if (type == "IMSI") {
-      return this.uid.IMSI;
-    } else if (type == "MAC") {
-      return this.uid.MAC;
-    } else if (type == "UUID") {
-      return this.uid.UUID;
     }
-  }*/
+
+    getPermission() {
+      this.androidPermissions.checkPermission(
+        this.androidPermissions.PERMISSION.READ_PHONE_STATE
+      ).then(res => {
+        if (res.hasPermission) {
+
+        } else {
+          this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.READ_PHONE_STATE).then(res => {
+            alert("Persmission Granted Please Restart App!");
+          }).catch(error => {
+            alert("Error! " + error);
+          });
+        }
+      }).catch(error => {
+        alert("Error! " + error);
+      });
+    }
+  */
+  /*  getID_UID(type) {
+      if (type == "IMEI") {
+        return this.uid.IMEI;
+      } else if (type == "ICCID") {
+        return this.uid.ICCID;
+      } else if (type == "IMSI") {
+        return this.uid.IMSI;
+      } else if (type == "MAC") {
+        return this.uid.MAC;
+      } else if (type == "UUID") {
+        return this.uid.UUID;
+      }
+    }*/
 
   // Render fake data
   getFakeData() {
@@ -106,7 +107,7 @@ export class Sync {
     ).subscribe(data => {
       this.sqlPorter.importSqlToDb(this.db, data)
         .then(_ => {
-          console.log('TablasCreadas');
+          //console.log('TablasCreadas');
           //  this.openOrCreateDB();
           this.isDbReady.next(true);
         })
@@ -214,7 +215,7 @@ export class Sync {
           }
 
         }).catch((err) => {
-          this.msgService.msgError(err.message);
+          this.msgService.msgError('Ha ocurrido un error al sincronizar los datos al dispositivo, Favor verifique su conexión a Internet e intente nuevamente más tarde.');
         });
   }
 
@@ -232,14 +233,13 @@ export class Sync {
     return resultado;
   }
 
-
   async procesoSyncUsuario(db, res) {
     let resultado;
     let deleteHc = 'DELETE FROM rk_hc_usuario';
     db.executeSql(deleteHc, []);
     let l = res['rk_hc_usuario'];
-    let p = l.map((l) => `(${l.id},'${l.cedula}','${l.clave}','${l.correo}','${l.estado}',${l.exportador_id},'${l.fecha_cre}','${l.fecha_mod}','${l.nombre}','${l.ultimo_ingreso}',${l.usuario_cre_id},${l.usuario_mod_id})`).join(',');
-    await db.executeSql(`INSERT INTO rk_hc_usuario (id,cedula,clave,correo,estado,exportador_id,fecha_cre,fecha_mod,nombre,ultimo_ingreso,usuario_cre_id,usuario_mod_id) VALUES ${p};`, {})
+    let p = l.map((l) => `(${l.id},'${l.cedula}','${l.clave}','${l.correo}','${l.estado}',${l.exportador_id},'${l.fecha_cre}','${l.fecha_mod}','${l.nombre}','${l.ultimo_ingreso}',${l.usuario_cre_id},${l.usuario_mod_id},'${l.administrador}')`).join(',');
+    await db.executeSql(`INSERT INTO rk_hc_usuario (id,cedula,clave,correo,estado,exportador_id,fecha_cre,fecha_mod,nombre,ultimo_ingreso,usuario_cre_id,usuario_mod_id,administrador) VALUES ${p};`, {})
       .then((resul) => {
         resultado = { estado: 'ok', mensaje: resul.rowsAffected }
       }
@@ -357,18 +357,20 @@ export class Sync {
   /* Sincronizar datos con el server*/
 
   conteoLoadingEnd: number = 0;
- async syncDataServer(db) {
-    let loading = await this.msgService.loadingCreate('Sincronizando datos por favor espere...1');
+  async syncDataServer(db) {
+    this.conteoLoadingEnd = 0;
+    let loading = await this.msgService.loadingCreate('Sincronizando datos por favor espere...');
+    //let loading = await this.msgService.loadingCreate('Sincronizando datos por favor espere.. '+(key+1)+'/'+dataCab.length);
+
     var Formulario: any = {};
     this.dbQuery.consultaAll('db', `SELECT * FROM rk_hc_form_cab WHERE liquidado ='S' and sincronizado = ?`, 'N')
       .then(async dataCab => {
         // console.log('dataCab');
-         console.log(dataCab);
+        //console.log(dataCab);
 
-        
+        this.msgService.loading(true, loading);
         Object.entries(dataCab).forEach(async ([key, element]: any) => {
-          let loading = await this.msgService.loadingCreate('Sincronizando datos por favor espere.. '+(key+1)+'/'+dataCab.length);
-          this.msgService.loading(true, loading);
+
           // console.log(key);
           Formulario['f' + key] = {};
           // await this.postDataServer(element); 256
@@ -381,30 +383,35 @@ export class Sync {
               Formulario['f' + key]['rk_hc_form_files'] = dataFiles;
             });
           Formulario['f' + key]['rk_hc_form_cab'] = element;
-        //  Formulario['f' + key]['identificador'] = this.getID_UID('UUID');
+          //  Formulario['f' + key]['identificador'] = this.getID_UID('UUID');
           await this.postDataServer(Formulario['f' + key], this.db, loading);
           //console.log('Formulario');
           //console.log(Formulario['f' + key]);
           //console.log(element);
         });
         //console.log(this.getID_UID('UUID'));
-        var timerInterval = setInterval(() => {
-          /*console.log(this.conteo);
-          console.log(dataCab.length);*/
-          if ((dataCab.length > 0) && (this.conteoLoadingEnd === dataCab.length)) {
-            console.log('entre');
-            this.msgService.loading(false, loading);
-            this.msgService.msgInfo('Datos enviados con exito');
-            this.conteoLoadingEnd = 0;
-            clearInterval(timerInterval);
-          }
-        }, 100);
+        if (dataCab.length > 0) {
+          var timerInterval = setInterval(() => {
+            console.log('syncConteo: ' + this.conteoLoadingEnd);
+            console.log('datosObtenidosConteo: ' + dataCab.length);
+            if ((dataCab.length > 0) && (this.conteoLoadingEnd === dataCab.length)) {
+              this.msgService.loading(false, loading);
+              this.msgService.msgInfo('Datos enviados con exito');
+
+              clearInterval(timerInterval);
+            }
+          }, 100);
+        }
+
 
         if (dataCab.length < 1) {
           this.msgService.loading(false, loading);
           this.msgService.msgInfo('No tiene datos para sincronizar.');
+          clearInterval(timerInterval);
         }
 
+      }).catch(() => {
+        this.msgService.loading(false, loading);
       });
   }
 
@@ -421,8 +428,6 @@ export class Sync {
     return await this.httpClient.post(`${this.urlPost}?accion=guardarDatosServer`, JSON.stringify(datos), options)
       .toPromise().then(
         (res: any) => {
-          // console.log(res);
-         // let mensaje = 'Datos enviados con exito';
 
           if (res.estado === 'ok') {
             let data = [
@@ -448,7 +453,6 @@ export class Sync {
             return;
           }
         }).catch((err) => {
-        //  console.log(err);
           this.msgService.loading(false, loading);
           this.msgService.msgError('Ha ocurrido un error en el servidor por favor intente más tarde. status:' + err.status + '; msg:' + err.statusText);
         });

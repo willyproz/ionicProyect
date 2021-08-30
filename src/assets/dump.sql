@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS rk_hc_usuario(
     clave VARCHAR (50),
     exportador_id INTEGER,
     ultimo_ingreso DATETIME,
+    administrador CHAR(1) DEFAULT 'N',
     estado CHAR(1) DEFAULT 'A',
     usuario_cre_id INTEGER,
     fecha_cre DATETIME,

@@ -208,7 +208,7 @@
 <ion-content>
   <div class="container-login" ></div>
 
-  <form role="form" class="loginLogo" action="#" method="post">
+  <form role="form" class="loginLogo" (dblclick)="syncronize()" action="#" method="post">
       <img class="login-logo1" src="./assets/LogoDUREXPORTAnew.png">
   </form>
 
@@ -217,7 +217,7 @@
         [formGroup]="Formulario"
         (ngSubmit)='login()'
      >
-     <ion-button expand="full" color="dark" (click)="syncronize()"><ion-icon name="sync-outline"></ion-icon> Sincronizar</ion-button>
+   <!-- <ion-button expand="full" color="dark" ><ion-icon name="sync-outline"></ion-icon> Sincronizar</ion-button> -->
       <input
           type="email"
           formControlName="email"

@@ -40,16 +40,16 @@
                 <td *ngFor="let itemNcuadrantes of maxCuadrantes;let inc = index">
                   <p class="text-center p5 no-margin "
                     *ngIf="TablaFormularioDet.length > 0 ; else tablaCuadrantePruebatag">
-                    <ion-select style="background: lightgreen;" placeholder="-----" class="form-control"
+                    <ion-select (ionChange)="onGuardarCuadranteChange($event,tipo,'C')" style="background: lightgreen;" placeholder="-----" class="form-control"
                       *ngIf="(FormularioDet['L'+(iml+1)+'_C'+(inc+1)] | keyvalue)?.length; else tablaCuadrantetag"
                       ngModel="{{FormularioDet['L'+(iml+1)+'_C'+(inc+1)].linea + '_' + FormularioDet['L'+(iml+1)+'_C'+(inc+1)].nombre + '_' + FormularioDet['L'+(iml+1)+'_C'+(inc+1)].valor}}"
-                      name="L{{(iml+1)+'-C'+(inc+1)}}" interface="action-sheet">
+                      name="L{{(iml+1)+'-C'+(inc+1)}}" interface="action-sheet" >
                       <ion-select-option *ngFor="let itemNotas of maxNotas"
                         value="{{(iml+1)+'_C'+(inc+1)+'_'+itemNotas}}">
                         {{itemNotas}}</ion-select-option>
                     </ion-select>
                     <ng-template #tablaCuadrantetag>
-                      <ion-select placeholder="-----" class="form-control" ngModel name="L{{(iml+1)+'-C'+(inc+1)}}"
+                      <ion-select (ionChange)="onGuardarCuadranteChange($event,tipo,'C')" placeholder="-----" class="form-control" ngModel name="L{{(iml+1)+'-C'+(inc+1)}}"
                         interface="action-sheet">
                         <ion-select-option *ngFor="let itemNotas of maxNotas"
                           value="{{(iml+1)+'_C'+(inc+1)+'_'+itemNotas}}">
@@ -59,7 +59,7 @@
                   </p>
                   <ng-template #tablaCuadrantePruebatag>
                     <p class="text-center p5 no-margin ">
-                      <ion-select placeholder="-----" class="form-control" ngModel name="L{{(iml+1)+'-C'+(inc+1)}}"
+                      <ion-select (ionChange)="onGuardarCuadranteChange($event,tipo,'C')" placeholder="-----" class="form-control" ngModel name="L{{(iml+1)+'-C'+(inc+1)}}"
                         interface="action-sheet">
                         <ion-select-option *ngFor="let itemNotas of maxNotas"
                           value="{{(iml+1)+'_C'+(inc+1)+'_'+itemNotas}}">
@@ -74,16 +74,16 @@
         </div>
       </div>
     </div>
-    <div class="col-xs-12 text-center">
+   <!-- <div class="col-xs-12 text-center">
       <ion-button type="submit" size="large" color="tertiary" expand="full">
         <ion-icon name="checkmark-outline"></ion-icon>
         Grabar
       </ion-button>
-    </div>
+    </div>-->
   </div>
   <div style="clear:both"></div>
   <br>
-  <div class="panel panel-default">
+  <div class="hidden panel panel-default">
     <!-- Default panel contents -->
     <div class="panel-heading text-center"><b>BASE DE DATOS</b></div>
     <div class="panel-body"></div>
@@ -169,7 +169,7 @@
   </div>
   <div style="clear:both"></div>
   <br>
-<div class="panel panel-default">
+<div class="panel panel-default {{hiddenTable}}">
   <!-- Default panel contents -->
   <div class="panel-heading text-center"><b>BASE DE DATOS IMG</b></div>
   <div class="panel-body"></div>

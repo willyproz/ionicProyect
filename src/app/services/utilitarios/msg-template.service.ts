@@ -13,7 +13,7 @@ export class MsgTemplateService {
 
   msgOk(msg: string = 'Datos grabados con exito') {
    //  Swal.fire(msg, '', 'success');
-   
+
    Swal.fire({
     title: '<strong>'+msg+'</strong>',
     icon: 'success',

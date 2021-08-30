@@ -50,9 +50,6 @@ export class LoginPage implements OnInit {
       let sql = 'SELECT COUNT(*) as cnt, nombre,id FROM rk_hc_usuario WHERE correo = "' + email + '"  and clave = "' + clave + '"'
         this.dbquery.consultaLogin('db', sql)
           .then(async (res) => {
-            console.log(res);
-            console.log(clave);
-            console.log(email);
             if (res[0].cnt === 1) {
               let emailCodec = Md5.hashStr(email);
               let token = emailCodec + clave;

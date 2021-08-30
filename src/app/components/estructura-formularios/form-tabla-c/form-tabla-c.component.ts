@@ -190,4 +190,68 @@ export class FormTablaCComponent implements OnInit {
   }
 
 
+  hiddenTable:any = 'hidden';
+  validarRol() {
+    let sql = `SELECT count(*) as cnt FROM rk_hc_usuario WHERE id = ${localStorage.getItem('id_usuario')} and administrador = 'S' and estado = ?`;
+    this.dbQuery.consultaAll('db', sql, 'A').then((res) => {
+      //console.log(res);
+      if (res[0].cnt > 0) {
+       this.hiddenTable = '';
+      } else {
+        this.hiddenTable = 'hidden';
+      }
+    });
+  }
+
+
+  onGuardarCuadranteChange($event,tipo_pag?:any, tipo_ubicacion?:any) {
+      let valor = $event.target.value
+
+      this.addCuadranteBD(valor,tipo_pag,tipo_ubicacion);
+  }
+
+
+  async addCuadranteBD(valor: any,tipo_pag?:any, tipo_ubicacion?:any) {
+        let resultado = valor.split('_');
+        let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_form}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
+        this.dbQuery.consultaAll('db', sql, 'N').then(result => {
+          let sql1 = `SELECT count(*) as cnt, id FROM rk_hc_form_det WHERE formulario_id = ${result[0].id} and linea = ${resultado[0]} and nombre = '${resultado[1]}' and tipo_pag = '${tipo_pag}' and usuario_cre_id = ${localStorage.getItem('id_usuario')} and estado = ? `;
+          this.dbQuery.consultaAll('db', sql1, 'A')
+            .then(resp => {
+              let data = [
+                result[0].id,
+                resultado[0],
+                resultado[1],
+                resultado[2],
+                tipo_pag,
+                tipo_ubicacion,
+                localStorage.getItem('id_usuario'),
+                this.MyUser.dateNow()
+              ];
+              if (resp[0].cnt > 0) {
+                this.dbQuery.db.executeSql(`UPDATE rk_hc_form_det SET formulario_id = ?, linea = ?,nombre=?,valor=?,tipo_pag=?,tipo_ubicacion=?,usuario_cre_id=?,fecha_cre=? WHERE id = ${resp[0].id}`, data)
+                .then(()=>{
+                  this.msg.toastMsg('Registro actualizado.', 'info');
+                })
+                .catch((err) => {
+                  this.msg.toastMsg(err, 'error');
+                });
+              } else {
+                let sql = 'INSERT INTO rk_hc_form_det (formulario_id,linea,nombre,valor,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?,?)';
+                this.dbQuery.insertar('db', sql, data).then(()=>{
+                  this.msg.toastMsg('Registro grabado.', 'success');
+                })
+                .catch((err) => {
+                  this.msg.toastMsg(err, 'error');
+                });
+              }
+              this.consultarTabla();
+
+            });
+        }).catch(err => {
+          this.msg.toastMsg(err, 'error');
+        });
+
+  }
+
 }

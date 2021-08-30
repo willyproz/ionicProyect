@@ -28,8 +28,9 @@
     <ion-col class="ion-align-self-start">
       <ion-item>
         <ion-label position="fixed">Lote</ion-label>
-        <ion-select [disabled]="SelectLote.length < 1" formControlName="lote_id" *ngIf="TablaFormularioCab.length < 1 ; else lotetag"
-          placeholder="Seleccionar lote" interface="action-sheet" (ionChange)="onChangeModulo($event)">
+        <ion-select [disabled]="SelectLote.length < 1" formControlName="lote_id"
+          *ngIf="TablaFormularioCab.length < 1 ; else lotetag" placeholder="Seleccionar lote" interface="action-sheet"
+          (ionChange)="onChangeModulo($event)">
           <ion-select-option *ngFor="let value of SelectLote" value="{{ value.codigo }}">{{ value.descripcion }}
           </ion-select-option>
         </ion-select>
@@ -41,21 +42,24 @@
     <ion-col class="ion-align-self-center">
       <ion-item>
         <ion-label position="fixed">Modulo</ion-label>
-        <ion-select [disabled]="SelectModulo.length < 1" formControlName="modulo_id" *ngIf="TablaFormularioCab.length < 1 ; else modulotag"
-          placeholder="Seleccionar modulo" interface="action-sheet">
+        <ion-select [disabled]="SelectModulo.length < 1" formControlName="modulo_id"
+          *ngIf="TablaFormularioCab.length < 1 ; else modulotag" placeholder="Seleccionar modulo"
+          interface="action-sheet">
           <ion-select-option *ngFor="let value of SelectModulo" value="{{ value.codigo }}">{{ value.descripcion }}
           </ion-select-option>
         </ion-select>
         <ng-template #modulotag>
-            <ion-input [disabled]="true">{{ FormularioCab[0].modulo }}</ion-input>
+          <ion-input [disabled]="true">{{ FormularioCab[0].modulo }}</ion-input>
         </ng-template>
       </ion-item>
     </ion-col>
     <ion-col class="ion-align-self-end">
       <ion-item>
         <ion-label position="fixed">Tipo de muestra</ion-label>
-        <ion-select formControlName="tipo_muestra_id" *ngIf="TablaFormularioCab.length < 1 ; else tipo_muestratag" placeholder="Seleccionar muestra" interface="action-sheet">
-          <ion-select-option *ngFor="let value of SelectTipoMuestra" value="{{ value.codigo }}">{{ value.descripcion }}</ion-select-option>
+        <ion-select formControlName="tipo_muestra_id" *ngIf="TablaFormularioCab.length < 1 ; else tipo_muestratag"
+          placeholder="Seleccionar muestra" interface="action-sheet">
+          <ion-select-option *ngFor="let value of SelectTipoMuestra" value="{{ value.codigo }}">{{ value.descripcion }}
+          </ion-select-option>
         </ion-select>
         <ng-template #tipo_muestratag>
           <ion-input [disabled]="true">{{FormularioCab[0].tipo_muestra}}</ion-input>
@@ -79,7 +83,7 @@
     </ion-col>
   </ion-row>
 </form>
-<div class="panel panel-default ">
+<div class="panel panel-default {{hiddenTable}} ">
   <!-- Default panel contents -->
   <div class="panel-heading text-center"><b>FORMULARIOS {{ FormularioCab[0]?.modulo }}</b></div>
   <div class="panel-body"></div>

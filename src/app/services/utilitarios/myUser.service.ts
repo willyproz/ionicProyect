@@ -12,7 +12,6 @@ export class MyUserService {
     let fecha = dt[0];
     let time = hoy[0];
     let fechaFinal = fecha + " " + time;
-    console.log(fechaFinal);
     return fechaFinal;
   }
 

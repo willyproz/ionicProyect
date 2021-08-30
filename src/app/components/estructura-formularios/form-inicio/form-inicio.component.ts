@@ -80,7 +80,7 @@ export class FormInicioComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.consultarTabla();
+    this.validarRol();
     this.Formulario = this.formBuilder.group({
       responsable_id: [''],
       hacienda_id: [''],
@@ -126,7 +126,6 @@ export class FormInicioComponent implements OnInit {
         this.dbQuery.consultaAll('db', sql, 'A')
           .then(item => {
             this.SelectModulo = item;
-            console.log(this.SelectModulo);
           }).catch(e => {
             console.log('moduloCons' + e.message);
             this.msg.msgError(e);
@@ -250,7 +249,6 @@ export class FormInicioComponent implements OnInit {
     this.dbQuery.consultaAll('db', sql, 'N').then(res => {
       let sql2 = `SELECT count(*) as cnt FROM rk_hc_form_det WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and formulario_id = ${res[0].id} and estado = ?`;
       this.dbQuery.consultaAll('db', sql2, 'A').then(result => {
-        console.log(result);
         if(result[0].cnt > 0){
           let data = [
             'S',
@@ -269,4 +267,19 @@ export class FormInicioComponent implements OnInit {
       });
     });
   }
+
+  hiddenTable:any = 'hidden';
+  validarRol() {
+    let sql = `SELECT count(*) as cnt FROM rk_hc_usuario WHERE id = ${localStorage.getItem('id_usuario')} and administrador = 'S' and estado = ?`;
+    this.dbQuery.consultaAll('db', sql, 'A').then((res) => {
+      //console.log(res);
+      if (res[0].cnt > 0) {
+       this.hiddenTable = '';
+      } else {
+        this.hiddenTable = 'hidden';
+      }
+    });
+  }
+
+
 }
