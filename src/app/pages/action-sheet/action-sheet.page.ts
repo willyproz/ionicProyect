@@ -22,13 +22,15 @@ export class ActionSheetPage implements OnInit {
   FormStruct: any[] = [];
   titulo: string = '';
   sigla: string = '';
-  ngOnInit() {
+  async ngOnInit() {
+    let loading = await this.Msg.loadingCreate('Cargando por favor espere...');
     let sigla = this.activatedRoute.snapshot.paramMap.get('id');
     this.dbQuery.consultaAll('db', 'SELECT * FROM rk_hc_tipo_formulario_cab fc LEFT JOIN rk_hc_tipo_formulario_det fd on fc.id = fd.tipo_formulario_cab_id WHERE fc.sigla = ?', sigla)
       .then(item => {
         this.titulo = item[0].nombre_formulario;
         this.sigla = item[0].sigla;
         this.FormStruct = item;
+        this.Msg.loading(false, loading);
       });
   }
 

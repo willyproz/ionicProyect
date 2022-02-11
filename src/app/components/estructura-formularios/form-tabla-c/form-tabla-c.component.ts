@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { DbQuery } from 'src/app/services/model/dbQuerys.service';
 import { MyUserService } from 'src/app/services/utilitarios/myUser.service';
 import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
+import { File } from '@awesome-cordova-plugins/file/ngx';
+import { MediaCapture, MediaFile, CaptureError, CaptureImageOptions } from '@awesome-cordova-plugins/media-capture/ngx';
 import { Router } from '@angular/router';
 import { MsgTemplateService } from 'src/app/services/utilitarios/msg-template.service';
 
@@ -44,7 +46,8 @@ export class FormTablaCComponent implements OnInit {
       this.maxNotas.push((i));
     }
   }
-
+  tempImagesTabla: any[] = [];
+  tempImagesCons: any[] = [];
   TablaFormularioDet: any[] = [];
 
   FormularioDet: any[] = [];
@@ -53,17 +56,49 @@ export class FormTablaCComponent implements OnInit {
     private dbQuery: DbQuery,
     private MyUser: MyUserService,
     private camera: Camera,
-    private msg: MsgTemplateService) { }
+    private file: File,
+    private mediaCapture: MediaCapture,
+    private msg: MsgTemplateService) { 
+      window.insertarImagen = function (data: any, tipo_pag: string, tipo_ubicacion: string, img: string,id_usuario:any,tipo_form:any,tempImagesCons:any,tempImagesTabla:any) {
+        let resultado = data.split('_');
+        let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${id_usuario} and tipo_form = '${tipo_form}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
+        dbQuery.consultaAll('db', sql, 'N').then(result => {
+          /*console.log(result);
+          console.log(resultado);
+          console.log(img);*/
+          let data = [
+            result[0].id,
+            resultado[0],
+            resultado[1],
+            img,
+            tipo_pag,
+            tipo_ubicacion,
+            localStorage.getItem('id_usuario'),
+            MyUser.dateNow()
+          ];
+          let sql = 'INSERT INTO rk_hc_form_files (formulario_id,linea,cuadrante,img,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?,?)';
+          dbQuery.insertar('db', sql, data)
+          msg.toastMsg('Imagen guardada con exito.', 'success');
+       //   window.consultarImagenes(tipo_pag,id_usuario,tempImagesTabla,tempImagesCons);
+        }).catch(err => {
+        //  console.log(err);
+          msg.toastMsg(err, 'error');
+        });
+      }
+    }
 
   ngOnInit() {
     this.consultarTabla();
     this.consultarImagenes();
   }
 
+  
   consultarTabla() {
+    console.log(this.tipo);
+    console.log(this.tipo_form);
     let sql = `SELECT d.* FROM rk_hc_form_det d
                  INNER JOIN rk_hc_form_cab rhfc on rhfc.id = d.formulario_id
-                 WHERE d.tipo_pag = '${this.tipo}' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?`;
+                 WHERE d.tipo_pag = '${this.tipo}' and rhfc.tipo_form = '${this.tipo_form}' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?`;
     this.dbQuery.consultaAll('db', sql, 'N')
       .then(item => {
         this.TablaFormularioDet = item;
@@ -124,13 +159,31 @@ export class FormTablaCComponent implements OnInit {
       this.modoCamaraBool = false;
     } else {
       this.modoCamaraBool = true;
+      this.consultarTabla();
+      this.consultarImagenes();
     }
   }
 
-  tempImagesTabla: any[] = [];
-  tempImagesCons: any[] = [];
+  
   camara(info: any, tipo_pag: string, tipo_ubicacion: string) {
-    const options: CameraOptions = {
+    let options: CaptureImageOptions = { limit: 1 }
+    this.mediaCapture.captureImage(options)
+      .then(
+        (data: MediaFile[]) => {
+          
+        // Convertir imagen
+        this.obtenerContenidoComoBase64(data[0].localURL,this.tipo_form,this.tempImagesCons,this.tempImagesTabla, function(tipo_form,tempImagesCons,tempImagesTabla,base64Image){
+
+          window.insertarImagen(info, tipo_pag, tipo_ubicacion, base64Image,localStorage.getItem('id_usuario'),tipo_form,tempImagesCons,tempImagesTabla);
+          //window.consultarImagenes(tipo_pag,localStorage.getItem('id_usuario'),tempImagesTabla,tempImagesCons);
+        });
+          
+        },
+        (err: CaptureError) => console.error(err)
+      );
+
+      
+    /*const options: CameraOptions = {
       quality: 70,
       destinationType: this.camera.DestinationType.DATA_URL,
       encodingType: this.camera.EncodingType.JPEG,
@@ -147,36 +200,16 @@ export class FormTablaCComponent implements OnInit {
 
     }, (err) => {
       // Handle error
-    });
+    });*/
   }
 
 
-  insertarImagen(data: any, tipo_pag: string, tipo_ubicacion: string, img: any) {
-    let resultado = data.split('_');
-    let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_form}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
-    this.dbQuery.consultaAll('db', sql, 'N').then(result => {
-      let data = [
-        result[0].id,
-        resultado[0],
-        resultado[1],
-        img,
-        tipo_pag,
-        tipo_ubicacion,
-        localStorage.getItem('id_usuario'),
-        this.MyUser.dateNow()
-      ];
-      let sql = 'INSERT INTO rk_hc_form_files (formulario_id,linea,cuadrante,img,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?,?)';
-      this.dbQuery.insertar('db', sql, data)
-      this.consultarImagenes();
-    }).catch(err => {
-      this.msg.toastMsg(err, 'error');
-    });
-  }
+  
 
   consultarImagenes() {
     let sql = `SELECT d.formulario_id,count(*) as cnt,d.linea,d.cuadrante FROM rk_hc_form_files d
                INNER JOIN rk_hc_form_cab rhfc on rhfc.id = d.formulario_id
-               WHERE d.tipo_pag = '${this.tipo}' and d.tipo_ubicacion = 'C' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?
+               WHERE d.tipo_pag = '${this.tipo}' and rhfc.tipo_form = '${this.tipo_form}' and d.tipo_ubicacion = 'C' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?
                GROUP BY d.cuadrante, d.linea`;
     this.dbQuery.consultaAll('db', sql, 'N')
       .then(item => {
@@ -253,5 +286,32 @@ export class FormTablaCComponent implements OnInit {
         });
 
   }
+
+  /**
+ * Esta función manejara la conversion de un archivo a formato base64
+ *
+ * @path string
+ * @callback La función recibe como primer parametro el contenido de la image
+ */
+obtenerContenidoComoBase64(path,a,b,c,callback){
+  window.resolveLocalFileSystemURL(path, gotFile, fail);
+          
+  function fail(e) {
+      alert('No se pudo encontrar el archivo');
+  }
+
+  function gotFile(fileEntry) {
+      fileEntry.file(function(file) {
+          var reader = new FileReader();
+          reader.onloadend = function(e) {
+             var content = this.result;
+             callback(a,b,c,content);
+          };
+
+          // El punto más importante, usa el método readAsDatURL del plugin
+          reader.readAsDataURL(file);
+      });
+  }
+}
 
 }

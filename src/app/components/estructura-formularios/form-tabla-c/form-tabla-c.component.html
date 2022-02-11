@@ -129,6 +129,12 @@
     <div style="clear:both"></div>
     </div>
     <div class="panel-body p5">
+      <div class="col-sm-4 col-sm-offset-4" style="text-align: center;">
+        <ion-button color="warning" (click)="consultarImagenes()" >
+          <ion-icon slot="end" name="refresh"></ion-icon>
+          Refrescar
+        </ion-button>
+      </div>
       <input type="hidden" class="form-control" [(ngModel)]="tipo" name="tipo_pag">
       <input type="hidden" class="form-control" ngModel="C" name="tipo_ubicacion">
       <div>
@@ -169,7 +175,7 @@
   </div>
   <div style="clear:both"></div>
   <br>
-<div class="panel panel-default {{hiddenTable}}">
+<div class="panel panel-default ">
   <!-- Default panel contents -->
   <div class="panel-heading text-center"><b>BASE DE DATOS IMG</b></div>
   <div class="panel-body"></div>

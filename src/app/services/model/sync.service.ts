@@ -51,7 +51,8 @@ export class Sync {
   }
 
   //ruta principal para sincronizar de 2 vias: dispositivo al server y server al dispositivo
-  urlPost = 'http://app.durexporta.com/procesos/syncHacienda';
+  urlPost = 'http://10.10.10.7:185/procesos/syncHacienda';
+  //urlPost = 'http://app.durexporta.com/procesos/syncHacienda';
 
   dbState() { return this.isDbReady.asObservable(); }
   /*  UniqueDeviceID: any;

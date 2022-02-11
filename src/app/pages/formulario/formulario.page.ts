@@ -74,4 +74,13 @@ export class FormularioPage {
         this.msgService.loading(false, loading)
       });
   }
+   declare l:any;
+   async initLoad() {
+    const loading = await this.msgService.loadingCreate('Cargando por favor espere...');
+    this.msgService.loading(true, loading)
+    this.l=loading;
+  }
+   ionViewDidLeave() {
+    this.msgService.loading(false,  this.l)
+  }
 }

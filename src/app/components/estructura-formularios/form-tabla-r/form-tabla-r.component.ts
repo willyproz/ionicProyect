@@ -3,8 +3,11 @@ import { FormBuilder, NgForm } from '@angular/forms';
 import { DbQuery } from 'src/app/services/model/dbQuerys.service';
 import { MyUserService } from 'src/app/services/utilitarios/myUser.service';
 import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
+import { File } from '@awesome-cordova-plugins/file/ngx';
+import { MediaCapture, MediaFile, CaptureError, CaptureImageOptions } from '@awesome-cordova-plugins/media-capture/ngx';
 import { MsgTemplateService } from 'src/app/services/utilitarios/msg-template.service';
 
+declare var window: any;
 @Component({
   selector: 'app-form-tabla-r',
   templateUrl: './form-tabla-r.component.html',
@@ -58,8 +61,35 @@ export class FormTablaRComponent implements OnInit {
   constructor(public formBuilder: FormBuilder,
     private dbQuery: DbQuery,
     private camera: Camera,
+    private file: File,
+    private mediaCapture: MediaCapture,
     private MyUser: MyUserService,
-    private msg: MsgTemplateService) { }
+    private msg: MsgTemplateService) { 
+      window.insertarImagen = function (data: any, tipo_pag: string, tipo_ubicacion: string, img: string,id_usuario:any,tipo_form:any,tempImagesCons:any,tempImagesTabla:any) {
+        let resultado = data.split('_');
+        let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${id_usuario} and tipo_form = '${tipo_form}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
+        dbQuery.consultaAll('db', sql, 'N').then(result => {
+          let data = [
+            result[0].id,
+            resultado[0],
+            resultado[1],
+            resultado[2],
+            img,
+            tipo_pag,
+            tipo_ubicacion,
+            id_usuario,
+            MyUser.dateNow()
+          ];
+              let sql = 'INSERT INTO rk_hc_form_files (formulario_id,linea,cuadrante,rama,img,tipo_pag,tipo_ubicacion,usuario_cre_id,fecha_cre) VALUES (?,?,?,?,?,?,?,?,?)';
+              dbQuery.insertar('db', sql, data);
+              msg.toastMsg('Imagen guardada con exito.', 'success');
+              //window.consultarImagenes(tipo_pag,id_usuario,tempImagesTabla,tempImagesCons);
+            }).catch(e => {
+              console.log(e);
+            });
+      
+      }
+    }
 
   ngOnInit() {
     this.consultarTabla();
@@ -70,7 +100,7 @@ export class FormTablaRComponent implements OnInit {
   consultarTabla() {
     let sql = `SELECT d.* FROM rk_hc_form_det d
                  INNER JOIN rk_hc_form_cab rhfc on rhfc.id = d.formulario_id
-                 WHERE d.tipo_pag = '${this.tipo}' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?`;
+                 WHERE d.tipo_pag = '${this.tipo}' and rhfc.tipo_form = '${this.tipo_form}' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?`;
     this.dbQuery.consultaAll('db', sql, 'N')
       .then(async item => {
         this.TablaFormularioDet = item;
@@ -129,6 +159,36 @@ export class FormTablaRComponent implements OnInit {
       this.modoCamaraBool = false;
     } else {
       this.modoCamaraBool = true;
+      this.consultarTabla();
+      this.consultarImagenes();
+    }
+    //console.log("modo camara: " + this.modoCamaraBool);
+  }
+
+  camara(info: any, tipo_pag: string, tipo_ubicacion: string) {
+    let options: CaptureImageOptions = { limit: 1 }
+    this.mediaCapture.captureImage(options)
+      .then(
+        (data: MediaFile[]) => {
+          
+        // Convertir imagen
+        this.obtenerContenidoComoBase64(data[0].localURL,this.tipo_form,this.tempImagesCons,this.tempImagesTabla, function(tipo_form,tempImagesCons,tempImagesTabla,base64Image){
+
+        window.insertarImagen(info, tipo_pag, tipo_ubicacion, base64Image,localStorage.getItem('id_usuario'),tipo_form,tempImagesCons,tempImagesTabla);
+
+        });
+          
+        },
+        (err: CaptureError) => console.error(err)
+      );
+
+  }
+
+  /*modoCamara() {
+    if (this.modoCamaraBool == true) {
+      this.modoCamaraBool = false;
+    } else {
+      this.modoCamaraBool = true;
     }
     //console.log("modo camara: " + this.modoCamaraBool);
   }
@@ -152,9 +212,9 @@ export class FormTablaRComponent implements OnInit {
     }, (err) => {
       // Handle error
     });
-  }
+  }*/
 
-
+/*
   insertarImagen(data: any, tipo_pag: string, tipo_ubicacion: string, img: any) {
     let resultado = data.split('_');
     let sql = `SELECT id FROM rk_hc_form_cab WHERE usuario_cre_id = ${localStorage.getItem('id_usuario')} and tipo_form = '${this.tipo_form}' and liquidado = ? ORDER BY id DESC LIMIT 1`;
@@ -176,14 +236,14 @@ export class FormTablaRComponent implements OnInit {
     }).catch(e => {
       console.log(e);
     });
-  }
+  }*/
 
 
   consultarImagenes() {
 
     let sql = `SELECT d.formulario_id,count(*) as cnt,d.linea,d.cuadrante,d.rama FROM rk_hc_form_files d
              INNER JOIN rk_hc_form_cab rhfc on rhfc.id = d.formulario_id
-             WHERE d.tipo_pag = '${this.tipo}' and d.tipo_ubicacion = 'R' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?
+             WHERE d.tipo_pag = '${this.tipo}' and rhfc.tipo_form = '${this.tipo_form}' and d.tipo_ubicacion = 'R' and d.usuario_cre_id = ${localStorage.getItem('id_usuario')} and rhfc.liquidado = ?
              GROUP BY d.cuadrante, d.linea, d.rama`;
     this.dbQuery.consultaAll('db', sql, 'N')
       .then(item => {
@@ -259,4 +319,33 @@ export class FormTablaRComponent implements OnInit {
     });
 
   }
+
+
+  /**
+ * Esta función manejara la conversion de un archivo a formato base64
+ *
+ * @path string
+ * @callback La función recibe como primer parametro el contenido de la image
+ */
+   obtenerContenidoComoBase64(path,a,b,c,callback){
+    window.resolveLocalFileSystemURL(path, gotFile, fail);
+            
+    function fail(e) {
+        alert('No se pudo encontrar el archivo');
+    }
+  
+    function gotFile(fileEntry) {
+        fileEntry.file(function(file) {
+            var reader = new FileReader();
+            reader.onloadend = function(e) {
+               var content = this.result;
+               callback(a,b,c,content);
+            };
+  
+            // El punto más importante, usa el método readAsDatURL del plugin
+            reader.readAsDataURL(file);
+        });
+    }
+  }
+
 }

@@ -11,6 +11,8 @@ import { SQLite } from '@ionic-native/sqlite/ngx';
 import { HttpClientModule } from '@angular/common/http';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { Camera } from '@ionic-native/camera/ngx';
+import { MediaCapture } from '@awesome-cordova-plugins/media-capture/ngx';
+import { File } from '@awesome-cordova-plugins/file/ngx';
 import { UniqueDeviceID } from '@ionic-native/unique-device-id/ngx';
 import { Uid } from '@ionic-native/uid/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
@@ -26,6 +28,8 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
     SQLitePorter,
     Uid,
     AndroidPermissions,
+    MediaCapture,
+    File,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent],

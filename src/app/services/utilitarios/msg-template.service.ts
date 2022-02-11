@@ -38,6 +38,23 @@ export class MsgTemplateService {
     var el = document.querySelector('body')!;
     el.classList.remove("swal2-height-auto");
   }
+  
+  msgPrueba(msg: string = 'Datos grabados con exito',ejecutar) {
+    Swal.fire({
+      title: '<strong>'+msg+'</strong>',
+      icon: 'success',
+      showDenyButton: false,
+      showCancelButton: false,
+      confirmButtonText: 'OK',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        ejecutar();
+      }
+    })
+ 
+     var el = document.querySelector('body')!;
+     el.classList.remove("swal2-height-auto");
+   }
 
   msgError(msg: string) {
    //Swal.fire(msg,'', 'error');
